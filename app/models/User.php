@@ -1,0 +1,171 @@
+<?php
+class User {
+    private $db;
+
+    public function __construct(){
+        $this->db = new Database;
+    }
+
+    // Registrar Usuario
+    public function register($data){
+        // Preparar Query
+        $this->db->query('INSERT INTO usuarios (nombre, email, password, role_id, empresa_id, institucion_id) VALUES(:nombre, :email, :password, :role_id, :empresa_id, :institucion_id)');
+
+        // Vincular valores
+        $this->db->bind(':nombre', $data['nombre']);
+        $this->db->bind(':email', $data['email']);
+        $this->db->bind(':password', $data['password']);
+        $this->db->bind(':role_id', $data['role_id']);
+        $this->db->bind(':empresa_id', !empty($data['empresa_id']) ? $data['empresa_id'] : null);
+        $this->db->bind(':institucion_id', !empty($data['institucion_id']) ? $data['institucion_id'] : null);
+
+        // Ejecutar
+        if($this->db->execute()){
+            // Obtener el ID del usuario insertado
+            $userId = $this->db->lastInsertId();
+
+            // Si es estudiante, crear perfil
+            if($data['role_id'] == 5){
+                $this->db->query('INSERT INTO perfil_estudiantes (usuario_id, matricula, carrera_id) VALUES(:usuario_id, :matricula, :carrera_id)');
+                $this->db->bind(':usuario_id', $userId);
+                $this->db->bind(':matricula', isset($data['matricula']) ? $data['matricula'] : 'PENDIENTE'); 
+                $this->db->bind(':carrera_id', isset($data['carrera_id']) ? $data['carrera_id'] : 1);
+                $this->db->execute();
+            }
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Login Usuario
+    public function login($email, $password){
+        $this->db->query('SELECT * FROM usuarios WHERE email = :email');
+        $this->db->bind(':email', $email);
+
+        $row = $this->db->single();
+
+        if($row){
+             $hashed_password = $row->password;
+             if(password_verify($password, $hashed_password)){
+                 return $row;
+             }
+        }
+        return false;
+    }
+
+    // Encontrar usuario por email
+    public function findUserByEmail($email){
+        $this->db->query('SELECT * FROM usuarios WHERE email = :email');
+        $this->db->bind(':email', $email);
+
+        $row = $this->db->single();
+
+        // Check row
+        if($this->db->rowCount() > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    // Obtener usuario por ID
+    public function getUserById($id){
+        $this->db->query('SELECT * FROM usuarios WHERE id = :id');
+        $this->db->bind(':id', $id);
+
+        return $this->db->single();
+    }
+
+    // Obtener todos los usuarios (para Admin)
+    public function getUsers(){
+        $this->db->query('SELECT * FROM usuarios ORDER BY created_at DESC');
+        return $this->db->resultSet();
+    }
+
+    // Actualizar Usuario
+    public function updateUser($data){
+        // Si hay password, actualizar todo, si no, mantener password
+        if(!empty($data['password'])){
+             $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, password = :password, role_id = :role_id, empresa_id = :empresa_id, institucion_id = :institucion_id WHERE id = :id');
+             $this->db->bind(':password', $data['password']);
+        } else {
+             $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, role_id = :role_id, empresa_id = :empresa_id, institucion_id = :institucion_id WHERE id = :id');
+        }
+
+        $this->db->bind(':id', $data['id']);
+        $this->db->bind(':nombre', $data['nombre']);
+        $this->db->bind(':email', $data['email']);
+        $this->db->bind(':role_id', $data['role_id']);
+        $this->db->bind(':empresa_id', !empty($data['empresa_id']) ? $data['empresa_id'] : null);
+        $this->db->bind(':institucion_id', !empty($data['institucion_id']) ? $data['institucion_id'] : null);
+
+        if($this->db->execute()){
+            // Update Student Profile if Role is 5
+            if($data['role_id'] == 5){
+                 // Check if profile exists
+                 $this->db->query('SELECT * FROM perfil_estudiantes WHERE usuario_id = :id');
+                 $this->db->bind(':id', $data['id']);
+                 $profile = $this->db->single();
+
+                 if($profile){
+                     $this->db->query('UPDATE perfil_estudiantes SET matricula = :matricula, carrera_id = :carrera_id WHERE usuario_id = :id');
+                 } else {
+                     $this->db->query('INSERT INTO perfil_estudiantes (usuario_id, matricula, carrera_id) VALUES(:id, :matricula, :carrera_id)');
+                 }
+                 $this->db->bind(':id', $data['id']);
+                 $this->db->bind(':matricula', isset($data['matricula']) ? $data['matricula'] : 'PENDIENTE');
+                 $this->db->bind(':carrera_id', isset($data['carrera_id']) ? $data['carrera_id'] : 1);
+                 $this->db->execute();
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Eliminar Usuario
+    public function deleteUser($id){
+        $this->db->query('DELETE FROM usuarios WHERE id = :id');
+        $this->db->bind(':id', $id);
+
+        if($this->db->execute()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    // Link User to Empresa
+    public function setEmpresaId($userId, $empresaId){
+        $this->db->query('UPDATE usuarios SET empresa_id = :empresa_id WHERE id = :id');
+        $this->db->bind(':empresa_id', $empresaId);
+        $this->db->bind(':id', $userId);
+        return $this->db->execute();
+    }
+    // Actualizar Perfil (Usuario)
+    public function updateProfile($data){
+        if(!empty($data['password'])){
+             $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, password = :password, foto_perfil = :foto_perfil WHERE id = :id');
+             $this->db->bind(':password', password_hash($data['password'], PASSWORD_DEFAULT));
+        } else {
+             $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, foto_perfil = :foto_perfil WHERE id = :id');
+        }
+
+        $this->db->bind(':id', $data['id']);
+        $this->db->bind(':nombre', $data['nombre']);
+        $this->db->bind(':email', $data['email']);
+        $this->db->bind(':foto_perfil', $data['foto_perfil']);
+
+        if($this->db->execute()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    // Obtener perfil de estudiante
+    public function getStudentProfile($userId){
+        $this->db->query('SELECT * FROM perfil_estudiantes WHERE usuario_id = :id');
+        $this->db->bind(':id', $userId);
+        return $this->db->single();
+    }
+}
