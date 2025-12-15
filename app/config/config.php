@@ -2,7 +2,7 @@
 // Configuración de acceso a la Base de Datos
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'root');
 define('DB_NAME', 'sigp_db');
 
 // Ruta de la aplicación

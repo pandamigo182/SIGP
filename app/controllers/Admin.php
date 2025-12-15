@@ -27,26 +27,75 @@ class Admin extends Controller {
     public function empresas_add(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            
+            // Handle File Upload
+            $logoPath = 'default_logo.png';
+            if(isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK){
+                $fileTmpPath = $_FILES['logo']['tmp_name'];
+                $fileName = $_FILES['logo']['name'];
+                $fileSize = $_FILES['logo']['size'];
+                $fileType = $_FILES['logo']['type'];
+                $fileNameCmps = explode(".", $fileName);
+                $fileExtension = strtolower(end($fileNameCmps));
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $uploadFileDir = dirname(APPROOT) . '/public/img/logos/';
+                
+                // Create directory if it doesn't exist
+                if (!file_exists($uploadFileDir)) {
+                    mkdir($uploadFileDir, 0755, true);
+                }
+
+                $dest_path = $uploadFileDir . $newFileName;
+                
+                if(move_uploaded_file($fileTmpPath, $dest_path)){
+                    $logoPath = $newFileName;
+                }
+            }
+
             $data = [
                 'nombre' => trim($_POST['nombre']),
                 'descripcion' => trim($_POST['descripcion']),
                 'direccion' => trim($_POST['direccion']),
                 'telefono' => trim($_POST['telefono']),
                 'website' => trim($_POST['website']),
-                'latitud' => '',
-                'longitud' => '',
-                'logo' => 'default_logo.png'
+                'latitud' => trim($_POST['latitud']),
+                'longitud' => trim($_POST['longitud']),
+                'nit' => trim($_POST['nit']),
+                'email_contacto' => trim($_POST['email_contacto']),
+                'representante_legal' => trim($_POST['representante_legal']),
+                'rubro' => trim($_POST['rubro']),
+                'departamento_id' => trim($_POST['departamento_id']),
+                'municipio_id' => trim($_POST['municipio_id']),
+                'distrito_id' => trim($_POST['distrito_id']),
+                'logo_path' => $logoPath,
+                'logo' => $logoPath 
             ];
             
             if($this->empresaModel->addEmpresa($data)){
                 flash('admin_message', 'Empresa registrada');
                 redirect('admin/empresas');
             } else {
-                die('Error');
+                die('Error al registrar la empresa');
             }
         } else {
-             $this->view('admin/empresas/add');
+             $departamentos = $this->empresaModel->getDepartamentos();
+             $data = [
+                 'departamentos' => $departamentos
+             ];
+             $this->view('admin/empresas/add', $data);
         }
+    }
+
+    public function get_municipios($departamento_id){
+        $municipios = $this->empresaModel->getMunicipios($departamento_id);
+        header('Content-Type: application/json');
+        echo json_encode($municipios);
+    }
+
+    public function get_distritos($municipio_id){
+        $distritos = $this->empresaModel->getDistritos($municipio_id);
+        header('Content-Type: application/json');
+        echo json_encode($distritos);
     }
 
     // Listar todos los usuarios
