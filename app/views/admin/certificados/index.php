@@ -12,6 +12,7 @@
                     <div class="card-header bg-white fw-bold">Subir Nueva Plantilla</div>
                     <div class="card-body">
                         <form action="<?php echo URLROOT; ?>/certificados/upload" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                             <div class="mb-3">
                                 <label class="form-label">Nombre de la Plantilla</label>
                                 <input type="text" name="nombre" class="form-control" placeholder="Ej: Diploma 2025" required>

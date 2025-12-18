@@ -50,6 +50,10 @@ class Pasantias extends Controller {
     
     public function store_feedback($id){
         if($_SERVER['REQUEST_METHOD'] != 'POST'){ redirect('student/index'); }
+
+         if(!validateCsrfToken($_POST['csrf_token'])){
+             die('Error de seguridad: Token CSRF inválido');
+        }
         
         $data = [
             'pasantia_id' => $id,
@@ -138,6 +142,10 @@ class Pasantias extends Controller {
     public function process_finalization($id){
         if($_SERVER['REQUEST_METHOD'] != 'POST'){ redirect('pasantias/company_index'); }
         if($_SESSION['user_role'] != 4){ redirect('dashboard'); }
+
+        if(!validateCsrfToken($_POST['csrf_token'])){
+             die('Error de seguridad: Token CSRF inválido');
+        }
 
         // Validate Ownership again
         $pasantia = $this->pasantiaModel->getPasantiaById($id);

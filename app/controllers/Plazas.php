@@ -64,6 +64,9 @@ class Plazas extends Controller {
         }
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            if(!validateCsrfToken($_POST['csrf_token'])){
+                die('Error de seguridad: Token CSRF inválido');
+            }
             // Sanitize
             $_POST = filter_input_array(INPUT_POST, [
                  'titulo' => FILTER_UNSAFE_RAW,
@@ -151,6 +154,9 @@ class Plazas extends Controller {
         }
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+             if(!validateCsrfToken($_POST['csrf_token'])){
+                die('Error de seguridad: Token CSRF inválido');
+            }
              // Sanitize
             $_POST = filter_input_array(INPUT_POST, [
                  'titulo' => FILTER_UNSAFE_RAW,

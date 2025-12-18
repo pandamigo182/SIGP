@@ -13,6 +13,7 @@
                 </div>
 
                 <form action="<?php echo URLROOT; ?>/pasantias/store_feedback/<?php echo $data['id']; ?>" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     <input type="hidden" name="empresa_id" value="<?php echo $data['pasantia']->empresa_id; ?>">
 
                     <div class="mb-4 text-center">

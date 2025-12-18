@@ -24,6 +24,9 @@ class Certificados extends Controller {
         if($_SESSION['user_role'] != 1 && $_SESSION['user_role'] != 2){ redirect('dashboard'); }
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            if(!validateCsrfToken($_POST['csrf_token'])){
+                 die('Error de seguridad: Token CSRF inválido');
+            }
             $data = [
                 'nombre' => trim($_POST['nombre']),
                 'monitor_err' => ''

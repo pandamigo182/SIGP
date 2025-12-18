@@ -4,6 +4,7 @@
         <div class="card card-body bg-light mt-4 shadow-sm">
             <h2 class="mb-4">Editar Plaza</h2>
             <form action="<?php echo URLROOT; ?>/plazas/edit/<?php echo $data['id']; ?>" method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                 <div class="form-group mb-3">
                     <label for="titulo">Título del Puesto: <sup>*</sup></label>
                     <input type="text" name="titulo" class="form-control form-control-lg <?php echo (!empty($data['titulo_err'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['titulo']; ?>">

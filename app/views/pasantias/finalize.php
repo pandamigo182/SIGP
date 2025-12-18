@@ -14,6 +14,7 @@
                 </div>
 
                 <form action="<?php echo URLROOT; ?>/pasantias/process_finalization/<?php echo $data['id']; ?>" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     
                     <h5 class="border-bottom pb-2 mb-3 text-primary">Evaluación General</h5>
                     
