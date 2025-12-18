@@ -77,10 +77,19 @@ class User {
         return $this->db->single();
     }
 
-    // Obtener todos los usuarios (para Admin)
-    public function getUsers(){
-        $this->db->query('SELECT * FROM usuarios ORDER BY created_at DESC');
+    // Obtener todos los usuarios (para Admin) con Paginación
+    public function getUsers($limit = 100, $offset = 0){
+        $this->db->query('SELECT * FROM usuarios ORDER BY created_at DESC LIMIT :limit OFFSET :offset');
+        $this->db->bind(':limit', $limit);
+        $this->db->bind(':offset', $offset);
         return $this->db->resultSet();
+    }
+
+    // Contar total de usuarios
+    public function countUsers(){
+         $this->db->query('SELECT COUNT(*) as total FROM usuarios');
+         $row = $this->db->single();
+         return $row->total;
     }
 
     // Actualizar Usuario
@@ -167,5 +176,12 @@ class User {
         $this->db->query('SELECT * FROM perfil_estudiantes WHERE usuario_id = :id');
         $this->db->bind(':id', $userId);
         return $this->db->single();
+    }
+
+    // Obtener usuarios por rol
+    public function getUsersByRole($roleId){
+        $this->db->query('SELECT * FROM usuarios WHERE role_id = :role_id');
+        $this->db->bind(':role_id', $roleId);
+        return $this->db->resultSet();
     }
 }

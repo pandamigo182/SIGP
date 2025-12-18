@@ -5,6 +5,7 @@
             <h2>Crear una Cuenta</h2>
             <p>Por favor llena este formulario para registrarte con nosotros</p>
             <form action="<?php echo URLROOT; ?>/auth/register" method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     <select name="role_id" class="form-select form-control-lg">
                         <option value="5">Estudiante</option>
                         <option value="4">Empresa</option>

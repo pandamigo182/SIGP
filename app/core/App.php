@@ -12,9 +12,15 @@ class App {
         $url = $this->getUrl();
 
         // 1. Buscar Controlador
-        if(isset($url[0]) && file_exists('../app/controllers/' . ucwords($url[0]) . '.php')){
-            $this->currentController = ucwords($url[0]);
-            unset($url[0]);
+        if(isset($url[0])){
+            if(file_exists('../app/controllers/' . ucwords($url[0]) . '.php')){
+                $this->currentController = ucwords($url[0]);
+                unset($url[0]);
+            } else {
+                // Controller not found
+                $this->currentController = 'Pages';
+                $this->currentMethod = 'notFound'; 
+            }
         }
         
         // Requerir el controlador
@@ -28,6 +34,9 @@ class App {
             if(method_exists($this->currentController, $url[1])){
                 $this->currentMethod = $url[1];
                 unset($url[1]);
+            } else {
+                 // Method not found in existing controller
+                 $this->currentMethod = 'notFound';
             }
         }
 

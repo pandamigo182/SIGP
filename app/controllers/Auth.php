@@ -2,17 +2,33 @@
 class Auth extends Controller {
     public function __construct(){
         $this->userModel = $this->model('User');
+        $this->bitacoraModel = $this->model('Bitacora');
+        require_once APPROOT . '/helpers/security_helper.php';
     }
 
     public function register(){
         // Check for POST
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+            // Validate CSRF
+            if(!validateCsrfToken($_POST['csrf_token'])){
+                die('Error de seguridad: Token CSRF inválido.');
+            }
+            
             // Process form
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            
+            // Sanitize POST data
+            $_POST = filter_input_array(INPUT_POST, [
+                'nombre' => FILTER_UNSAFE_RAW, // We will sanitize manually
+                'email' => FILTER_SANITIZE_EMAIL,
+                'password' => FILTER_UNSAFE_RAW,
+                'confirm_password' => FILTER_UNSAFE_RAW,
+                'role_id' => FILTER_SANITIZE_NUMBER_INT
+            ]);
 
             // Init data
             $data = [
-                'nombre' => trim($_POST['nombre']),
+                'nombre' => sanitizeString($_POST['nombre']),
                 'email' => trim($_POST['email']),
                 'password' => trim($_POST['password']),
                 'confirm_password' => trim($_POST['confirm_password']),
@@ -26,6 +42,8 @@ class Auth extends Controller {
             // Validar Email
             if(empty($data['email'])){
                 $data['email_err'] = 'Por favor ingrese su email';
+            } elseif(!validateEmail($data['email'])) {
+                $data['email_err'] = 'Formato de email inválido';
             } else {
                 // Check email
                 if($this->userModel->findUserByEmail($data['email'])){
@@ -36,12 +54,14 @@ class Auth extends Controller {
             // Validar Nombre
             if(empty($data['nombre'])){
                 $data['nombre_err'] = 'Por favor ingrese su nombre';
+            } elseif(!validateName($data['nombre'])) {
+                $data['nombre_err'] = 'El nombre solo puede contener letras';
             }
 
             // Validar Password
             if(empty($data['password'])){
                 $data['password_err'] = 'Por favor ingrese una contraseña';
-            } elseif(strlen($data['password']) < 6){
+            } elseif(!validatePassword($data['password'])){
                 $data['password_err'] = 'La contraseña debe tener al menos 6 caracteres';
             }
 
@@ -96,8 +116,18 @@ class Auth extends Controller {
     public function login(){
         // Check for POST
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+            // Validate CSRF
+            if(!validateCsrfToken($_POST['csrf_token'])){
+                $this->bitacoraModel->log(null, 'LOGIN_FAILED_CSRF', 'Intento de login con token CSRF inválido. Email: ' . $_POST['email']);
+                die('Error de seguridad: Token CSRF inválido.');
+            }
+
             // Process form
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $_POST = filter_input_array(INPUT_POST, [
+                'email' => FILTER_SANITIZE_EMAIL,
+                'password' => FILTER_UNSAFE_RAW
+            ]);
             
             $data = [
                 'email' => trim($_POST['email']),
@@ -121,6 +151,8 @@ class Auth extends Controller {
                 // User found
             } else {
                 $data['email_err'] = 'Usuario no encontrado';
+                // Log Failed Attempt (Unknown User)
+                $this->bitacoraModel->log(null, 'LOGIN_FAILED_USER', 'Usuario no encontrado: ' . $data['email']);
             }
 
             // Make sure errors are empty
@@ -130,10 +162,19 @@ class Auth extends Controller {
                 $loggedInUser = $this->userModel->login($data['email'], $data['password']);
 
                 if($loggedInUser){
+                    // Security: Regenerate Session ID to prevent fixation
+                    session_regenerate_id(true);
+                    
+                    // Log Success
+                    $this->bitacoraModel->log($loggedInUser->id, 'LOGIN_SUCCESS', 'Inicio de sesión exitoso.');
+
                     // Create Session
                     $this->createUserSession($loggedInUser);
                 } else {
                     $data['password_err'] = 'Contraseña incorrecta';
+                    // Log Failed Attempt (Bad Password)
+                    $this->bitacoraModel->log(null, 'LOGIN_FAILED_PASS', 'Contraseña incorrecta para: ' . $data['email']);
+                    
                     $this->view('auth/login', $data);
                 }
             } else {

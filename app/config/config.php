@@ -9,8 +9,9 @@ define('DB_NAME', 'sigp_db');
 define('APPROOT', dirname(dirname(__FILE__)));
 
 // URL raíz (Dinámica)
-// Asegúrate de cambiar esto si tu carpeta tiene otro nombre o estás en producción
-define('URLROOT', 'http://localhost/Nexus-Pasantias');
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+define('URLROOT', $protocol . "://" . $host . "/SIGP");
 
 // Nombre del Sitio
 define('SITENAME', 'SIGP - Sistema Integral de Gestión de Pasantías');

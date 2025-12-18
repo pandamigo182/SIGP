@@ -3,6 +3,7 @@
 require_once '../app/config/config.php';
 require_once '../app/helpers/session_helper.php';
 require_once '../app/helpers/notification_helper.php';
+require_once '../app/helpers/system_helper.php';
 
 // Autocargar librerías del Core
 spl_autoload_register(function($className){

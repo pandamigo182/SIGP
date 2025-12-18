@@ -30,8 +30,9 @@ class Student {
                 estado_civil = :estado_civil,
                 telefono = :telefono,
                 direccion = :direccion,
-                departamento = :departamento,
-                municipio = :municipio,
+                departamento_id = :departamento_id,
+                municipio_id = :municipio_id,
+                distrito_id = :distrito_id,
                 institucion = :institucion,
                 nivel_academico = :nivel_academico,
                 estado_ocupacional = :estado_ocupacional
@@ -47,8 +48,9 @@ class Student {
         $this->db->bind(':estado_civil', $data['estado_civil']);
         $this->db->bind(':telefono', $data['telefono']);
         $this->db->bind(':direccion', $data['direccion']);
-        $this->db->bind(':departamento', $data['departamento']);
-        $this->db->bind(':municipio', $data['municipio']);
+        $this->db->bind(':departamento_id', $data['departamento_id']);
+        $this->db->bind(':municipio_id', $data['municipio_id']);
+        $this->db->bind(':distrito_id', $data['distrito_id']);
         $this->db->bind(':institucion', $data['institucion']);
         $this->db->bind(':nivel_academico', $data['nivel_academico']);
         $this->db->bind(':estado_ocupacional', $data['estado_ocupacional']);

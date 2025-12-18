@@ -21,7 +21,7 @@ class Dashboard extends Controller {
         
         switch($roleId){
             case 1:
-                $this->view('admin/dashboard', $data);
+                redirect('admin');
                 break;
             case 2:
                 // Coordinator Logic
@@ -48,7 +48,9 @@ class Dashboard extends Controller {
                 break;
             case 5:
                 $postulacionModel = $this->model('Postulacion');
+                $pasantiaModel = $this->model('Pasantia');
                 $data['postulaciones'] = $postulacionModel->getPostulacionesByEstudiante($_SESSION['user_id']);
+                $data['pasantias_list'] = $pasantiaModel->getPasantiasPorEstudiante($_SESSION['user_id']);
                 $this->view('student/dashboard', $data);
                 break;
             default:

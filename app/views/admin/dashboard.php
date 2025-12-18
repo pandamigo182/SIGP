@@ -1,82 +1,185 @@
 <?php require APPROOT . '/views/layouts/header.php'; ?>
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12 mb-4">
-            <h2 class="fw-bold text-danger"><i class="fas fa-shield-alt me-2"></i>Panel de Administrador</h2>
-            <p class="text-muted">Control total del sistema y configuración.</p>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard Administrativo</h1>
+        <p class="text-muted">Resumen de actividad del Sistema Integral de Gestión de Pasantías.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Active Internships -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-0">Pasantías Activas</h6>
+                        <h2 class="display-4 fw-bold mb-0"><?php echo $data['activePasantias']; ?></h2>
+                    </div>
+                    <i class="fas fa-briefcase fa-3x opacity-50"></i>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Usuarios -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-primary">
-                        <i class="fas fa-users-cog fa-3x"></i>
+    <!-- Total Students -->
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-0">Estudiantes</h6>
+                        <h2 class="display-4 fw-bold mb-0"><?php echo $data['totalStudents']; ?></h2>
                     </div>
-                    <h5 class="card-title">Usuarios</h5>
-                    <p class="card-text small text-muted">Administrar todos los usuarios y roles.</p>
-                    <a href="<?php echo URLROOT; ?>/admin/users" class="btn btn-primary w-100 rounded-pill">Gestionar</a>
+                    <i class="fas fa-user-graduate fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Empresas -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-secondary">
-                        <i class="fas fa-building fa-3x"></i>
+    <!-- Total Companies -->
+    <div class="col-md-3">
+        <div class="card bg-info text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-0">Empresas</h6>
+                        <h2 class="display-4 fw-bold mb-0"><?php echo $data['totalCompanies']; ?></h2>
                     </div>
-                    <h5 class="card-title">Empresas</h5>
-                    <p class="card-text small text-muted">Gestión específica de empresas.</p>
-                    <a href="<?php echo URLROOT; ?>/admin/empresas" class="btn btn-outline-secondary w-100 rounded-pill">Ver Empresas</a>
+                    <i class="fas fa-building fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Pasantias -->
-        <div class="col-md-3 mb-4">
-             <div class="card h-100 shadow-sm border-0">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-warning">
-                        <i class="fas fa-file-contract fa-3x"></i>
+    <!-- Total Plazas -->
+    <div class="col-md-3">
+        <div class="card bg-warning text-white shadow h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-0">Plazas Ofertadas</h6>
+                        <h2 class="display-4 fw-bold mb-0"><?php echo $data['totalPlazas']; ?></h2>
                     </div>
-                    <h5 class="card-title">Pasantías</h5>
-                    <p class="card-text small text-muted">Gestión de pasantías.</p>
-                    <a href="<?php echo URLROOT; ?>/pasantias" class="btn btn-outline-warning w-100 rounded-pill">Gestionar</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Configuración -->
-        <div class="col-md-3 mb-4">
-             <div class="card h-100 shadow-sm border-0">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-dark">
-                        <i class="fas fa-cogs fa-3x"></i>
-                    </div>
-                    <h5 class="card-title">Configuración</h5>
-                    <p class="card-text small text-muted">Ajustes generales del sistema.</p>
-                    <a href="<?php echo URLROOT; ?>/admin/settings" class="btn btn-outline-dark w-100 rounded-pill">Ajustes</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Logs/Reportes -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow-sm border-0">
-                <div class="card-body text-center p-4">
-                    <div class="mb-3 text-success">
-                        <i class="fas fa-file-alt fa-3x"></i>
-                    </div>
-                    <h5 class="card-title">Logs System</h5>
-                    <p class="card-text small text-muted">Ver actividad reciente.</p>
-                    <a href="<?php echo URLROOT; ?>/admin/logs" class="btn btn-outline-success w-100 rounded-pill">Ver Logs</a>
+                    <i class="fas fa-search-dollar fa-3x opacity-50"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div class="col-12 mb-3">
+        <h4 class="fw-bold text-secondary"><i class="fas fa-th-large me-2"></i>Módulos de Gestión</h4>
+    </div>
+    
+    <!-- Module: Usuarios -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/admin/users" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-users-cog fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Gestión de Usuarios</h5>
+                    <p class="text-muted small mb-0">Administrar estudiantes, empresas, tutores y personal administrativo.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Module: Empresas -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/admin/empresas" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-building fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Gestión de Empresas</h5>
+                    <p class="text-muted small mb-0">Verificar y administrar convenios y perfiles de empresas.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Module: Plazas/Pasantías -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/admin/plazas" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-briefcase fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Ofertas de Pasantías</h5>
+                    <p class="text-muted small mb-0">Supervisar las plazas ofertadas y publicadas.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Module: Bitácora -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/admin/logs" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-dark bg-opacity-10 text-dark rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-history fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Bitácora de Sistema</h5>
+                    <p class="text-muted small mb-0">Auditoría de acciones y seguridad.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Module: Reportes -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/reportes" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Reportes y Estadísticas</h5>
+                    <p class="text-muted small mb-0">Generar informes de gestión y resultados.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/admin/settings" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-cogs fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Configuración</h5>
+                    <p class="text-muted small mb-0">Parámetros generales del sistema.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Module: Certificados -->
+    <div class="col-md-4 mb-4">
+        <a href="<?php echo URLROOT; ?>/certificados/index" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-0 hover-scale">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-certificate fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark">Diplomas y Certificados</h5>
+                    <p class="text-muted small mb-0">Gestionar plantillas de diplomas.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<style>
+    .hover-scale { transition: transform 0.2s; }
+    .hover-scale:hover { transform: translateY(-5px); cursor: pointer; }
+</style>
 <?php require APPROOT . '/views/layouts/footer.php'; ?>

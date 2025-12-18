@@ -53,6 +53,61 @@
         </div>
     </div>
 
+    <!-- Mis Pasantías (Activas/Finalizadas) -->
+    <?php if(!empty($data['pasantias_list'])): ?>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 border-start border-5 border-info">
+                <div class="card-header bg-white border-0 py-3">
+                    <h4 class="mb-0 text-info"><i class="fas fa-project-diagram me-2"></i>Mis Pasantías</h4>
+                </div>
+                <div class="card-body">
+                    <?php flash('student_message'); ?>
+                    <?php flash('pasantia_message'); ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                             <thead class="table-light">
+                                 <tr>
+                                     <th>Proyecto / Puesto</th>
+                                     <th>Empresa</th>
+                                     <th>Fecha Inicio</th>
+                                     <th>Estado</th>
+                                     <th>Certificado</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 <?php foreach($data['pasantias_list'] as $pasantia): ?>
+                                     <tr>
+                                         <td class="fw-bold"><?php echo $pasantia->proyecto_asociado; ?></td>
+                                         <td><?php echo $pasantia->nombre_empresa; ?></td>
+                                         <td><?php echo date('d/m/Y', strtotime($pasantia->fecha_inicio)); ?></td>
+                                         <td>
+                                             <?php if($pasantia->estado == 'finalizada'): ?>
+                                                 <span class="badge bg-secondary"><i class="fas fa-flag-checkered me-1"></i> Finalizada</span>
+                                             <?php else: ?>
+                                                 <span class="badge bg-success"><i class="fas fa-play-circle me-1"></i> Activa</span>
+                                             <?php endif; ?>
+                                         </td>
+                                         <td>
+                                             <?php if($pasantia->estado == 'finalizada'): ?>
+                                                 <a href="<?php echo URLROOT; ?>/certificados/generate/<?php echo $pasantia->id; ?>" target="_blank" class="btn btn-primary btn-sm rounded-pill shadow-sm">
+                                                     <i class="fas fa-download me-1"></i> Descargar Constancia
+                                                 </a>
+                                             <?php else: ?>
+                                                 <small class="text-muted text-center d-block">Al finalizar</small>
+                                             <?php endif; ?>
+                                         </td>
+                                     </tr>
+                                 <?php endforeach; ?>
+                             </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Mis Postulaciones -->
     <div class="row mt-4">
         <div class="col-md-12">

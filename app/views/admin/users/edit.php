@@ -111,18 +111,35 @@
                         
                         <!-- Location -->
                         <div class="tab-pane fade" id="location" role="tabpanel">
-                             <div class="row">
+                            <div class="row">
                                 <div class="col-md-4 mb-2">
                                     <label>Dirección:</label>
                                     <input type="text" name="direccion" class="form-control form-control-sm" value="<?php echo $data['direccion']; ?>">
                                 </div>
                                 <div class="col-md-4 mb-2">
                                     <label>Departamento:</label>
-                                    <input type="text" name="departamento" class="form-control form-control-sm" value="<?php echo $data['departamento']; ?>">
+                                    <select name="departamento_id" id="departamento_id" class="form-select form-select-sm">
+                                        <option value="">Seleccione</option>
+                                        <?php if(isset($data['departamentos_list'])): ?>
+                                            <?php foreach($data['departamentos_list'] as $dep): ?>
+                                                <option value="<?php echo $dep->id; ?>" <?php echo ($data['departamento_id'] == $dep->id) ? 'selected' : ''; ?>>
+                                                    <?php echo $dep->nombre; ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
                                 </div>
                                 <div class="col-md-4 mb-2">
                                     <label>Municipio:</label>
-                                    <input type="text" name="municipio" class="form-control form-control-sm" value="<?php echo $data['municipio']; ?>">
+                                    <select name="municipio_id" id="municipio_id" class="form-select form-select-sm" data-selected="<?php echo $data['municipio_id']; ?>">
+                                        <option value="">Seleccione Departamento primero</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <label>Distrito:</label>
+                                    <select name="distrito_id" id="distrito_id" class="form-select form-select-sm" data-selected="<?php echo $data['distrito_id']; ?>">
+                                        <option value="">Seleccione Municipio primero</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -323,12 +340,12 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle Student Fields
         const roleSelect = document.querySelector('select[name="role_id"]');
         const studentFields = document.getElementById('student-fields');
         const companyField = document.getElementById('company-field');
 
         function toggleStudentFields() {
-             // Hide all
             studentFields.style.display = 'none';
             if(companyField) companyField.style.display = 'none';
 
@@ -339,8 +356,74 @@
             }
         }
 
-        roleSelect.addEventListener('change', toggleStudentFields);
-        toggleStudentFields(); // Run on load
+        if(roleSelect){
+            roleSelect.addEventListener('change', toggleStudentFields);
+            toggleStudentFields();
+        }
+
+        // Dependent Dropdowns (Location)
+        const depSelect = document.getElementById('departamento_id');
+        const munSelect = document.getElementById('municipio_id');
+        const disSelect = document.getElementById('distrito_id');
+
+        function loadMunicipios(depId, selectedMunId = null) {
+            if(!depId) {
+                munSelect.innerHTML = '<option value="">Seleccione Departamento primero</option>';
+                disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+                return;
+            }
+            munSelect.innerHTML = '<option value="">Cargando...</option>';
+            fetch('<?php echo URLROOT; ?>/admin/get_municipios/' + depId)
+                .then(response => response.json())
+                .then(data => {
+                    munSelect.innerHTML = '<option value="">Seleccione</option>';
+                    data.forEach(m => {
+                        let isSelected = (selectedMunId && selectedMunId == m.id) ? 'selected' : '';
+                        munSelect.innerHTML += `<option value="${m.id}" ${isSelected}>${m.nombre}</option>`;
+                    });
+                    // Create even if event change not triggered, we might want to load distritos if mun is pre-selected
+                    if(selectedMunId) {
+                         loadDistritos(selectedMunId, disSelect.getAttribute('data-selected'));
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function loadDistritos(munId, selectedDisId = null) {
+            if(!munId) {
+                disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+                return;
+            }
+            disSelect.innerHTML = '<option value="">Cargando...</option>';
+            fetch('<?php echo URLROOT; ?>/admin/get_distritos/' + munId) 
+                .then(response => response.json())
+                .then(data => {
+                    disSelect.innerHTML = '<option value="">Seleccione</option>';
+                    data.forEach(d => {
+                        let isSelected = (selectedDisId && selectedDisId == d.id) ? 'selected' : '';
+                        disSelect.innerHTML += `<option value="${d.id}" ${isSelected}>${d.nombre}</option>`;
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+
+        if(depSelect) {
+            depSelect.addEventListener('change', function() {
+                loadMunicipios(this.value);
+                disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+            });
+            
+            // Initial load check
+            if(depSelect.value) {
+                loadMunicipios(depSelect.value, munSelect.getAttribute('data-selected'));
+            }
+        }
+
+        if(munSelect) {
+            munSelect.addEventListener('change', function() {
+                loadDistritos(this.value);
+            });
+        }
     });
 </script>
 <?php require APPROOT . '/views/layouts/footer.php'; ?>

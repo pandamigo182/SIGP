@@ -3,14 +3,43 @@ class Plazas extends Controller {
     public function __construct(){
         $this->plazaModel = $this->model('Plaza');
         $this->userModel = $this->model('User');
+        $this->empresaModel = $this->model('Empresa'); // Load Empresa model for filters
+        $this->bitacoraModel = $this->model('Bitacora');
     }
 
     public function index(){
-        $plazas = $this->plazaModel->getPlazas();
-        $data = ['plazas' => $plazas];
+        $filters = [
+            'q' => isset($_GET['q']) ? trim($_GET['q']) : '',
+            'rubro' => isset($_GET['rubro']) ? trim($_GET['rubro']) : '',
+            'departamento_id' => isset($_GET['departamento_id']) ? $_GET['departamento_id'] : '',
+            'municipio_id' => isset($_GET['municipio_id']) ? $_GET['municipio_id'] : ''
+        ];
+        
+        // Pagination
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10; // Requested 10 per page
+        $offset = ($page - 1) * $limit;
+
+        $plazas = $this->plazaModel->getPlazas($filters, $limit, $offset);
+        $totalPlazas = $this->plazaModel->getPlazasCount($filters);
+        $totalPages = ceil($totalPlazas / $limit);
+
+        $rubros = $this->empresaModel->getRubros();
+        $departamentos = $this->empresaModel->getDepartamentos();
+
+        $data = [
+            'title' => 'Pasantías Disponibles',
+            'plazas' => $plazas,
+            'rubros' => $rubros,
+            'departamentos' => $departamentos,
+            'pagination' => [
+                'current_page' => $page,
+                'total_pages' => $totalPages,
+                'total_items' => $totalPlazas
+            ]
+        ];
         $this->view('plazas/index', $data);
     }
-
     // Gestionar plazas propias (Para Empresa)
     public function manage(){
         if($_SESSION['user_role'] != 4){ // 4 = Empresa
@@ -36,26 +65,45 @@ class Plazas extends Controller {
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
             // Sanitize
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $_POST = filter_input_array(INPUT_POST, [
+                 'titulo' => FILTER_UNSAFE_RAW,
+                 'descripcion' => FILTER_UNSAFE_RAW,
+                 'requisitos' => FILTER_UNSAFE_RAW,
+                 'competencias_requeridas' => FILTER_UNSAFE_RAW,
+                 'modalidad' => FILTER_UNSAFE_RAW,
+                 'cantidad_vacantes' => FILTER_SANITIZE_NUMBER_INT,
+                 'fecha_limite' => FILTER_UNSAFE_RAW
+            ]);
 
             $data = [
-                'titulo' => trim($_POST['titulo']),
-                'descripcion' => trim($_POST['descripcion']),
-                'requisitos' => trim($_POST['requisitos']),
+                'titulo' => sanitizeString($_POST['titulo']),
+                'descripcion' => sanitizeString($_POST['descripcion']),
+                'requisitos' => sanitizeString($_POST['requisitos']),
+                'competencias_requeridas' => sanitizeString($_POST['competencias_requeridas']),
+                'modalidad' => trim($_POST['modalidad']),
+                'cantidad_vacantes' => trim($_POST['cantidad_vacantes']),
                 'fecha_limite' => trim($_POST['fecha_limite']),
+                'duracion' => trim($_POST['duracion']),
                 'empresa_id' => $_SESSION['user_id'],
                 'titulo_err' => '',
                 'descripcion_err' => '',
-                'fecha_err' => ''
+                'competencias_err' => '',
+                'vacantes_err' => '',
+                'fecha_err' => '',
+                'duracion_err' => ''
             ];
 
             // Validate
             if(empty($data['titulo'])){ $data['titulo_err'] = 'Por favor ingrese un título'; }
             if(empty($data['descripcion'])){ $data['descripcion_err'] = 'Por favor ingrese una descripción'; }
             if(empty($data['fecha_limite'])){ $data['fecha_err'] = 'Ingrese fecha límite'; }
+            if(empty($data['duracion'])){ $data['duracion_err'] = 'Ingrese la duración'; }
 
-            if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err'])){
+            if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err']) && empty($data['duracion_err'])){
                  if($this->plazaModel->addPlaza($data)){
+                     // Log Creation
+                     $this->bitacoraModel->log($_SESSION['user_id'], 'CREATE_PLAZA', 'Publicó plaza: ' . $data['titulo']);
+
                      flash('plaza_message', 'Plaza publicada correctamente');
                      redirect('plazas/manage');
                  } else {
@@ -66,15 +114,25 @@ class Plazas extends Controller {
             }
 
         } else {
+            // Inicializar datos con valores por defecto
             $data = [
                 'titulo' => '',
                 'descripcion' => '',
                 'requisitos' => '',
+                'competencias_requeridas' => '',
+                'modalidad' => 'Presencial', // Valor predeterminado
+                'cantidad_vacantes' => 1,
                 'fecha_limite' => '',
+                'duracion' => '6 meses',
+                // Variables para mensajes de error
                 'titulo_err' => '',
                 'descripcion_err' => '',
-                'fecha_err' => ''
+                'competencias_err' => '',
+                'vacantes_err' => '',
+                'fecha_err' => '',
+                'duracion_err' => ''
             ];
+            // Cargar la vista de creación con los datos vacíos
             $this->view('plazas/create', $data);
         }
     }
@@ -94,27 +152,47 @@ class Plazas extends Controller {
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
              // Sanitize
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $_POST = filter_input_array(INPUT_POST, [
+                 'titulo' => FILTER_UNSAFE_RAW,
+                 'descripcion' => FILTER_UNSAFE_RAW,
+                 'requisitos' => FILTER_UNSAFE_RAW,
+                 'competencias_requeridas' => FILTER_UNSAFE_RAW,
+                 'modalidad' => FILTER_UNSAFE_RAW,
+                 'cantidad_vacantes' => FILTER_SANITIZE_NUMBER_INT,
+                 'fecha_limite' => FILTER_UNSAFE_RAW,
+                 'estado' => FILTER_UNSAFE_RAW
+            ]);
 
             $data = [
                 'id' => $id,
-                'titulo' => trim($_POST['titulo']),
-                'descripcion' => trim($_POST['descripcion']),
-                'requisitos' => trim($_POST['requisitos']),
+                'titulo' => sanitizeString($_POST['titulo']),
+                'descripcion' => sanitizeString($_POST['descripcion']),
+                'requisitos' => sanitizeString($_POST['requisitos']),
+                'competencias_requeridas' => sanitizeString($_POST['competencias_requeridas']),
+                'modalidad' => trim($_POST['modalidad']),
+                'cantidad_vacantes' => trim($_POST['cantidad_vacantes']),
                 'fecha_limite' => trim($_POST['fecha_limite']),
+                'duracion' => trim($_POST['duracion']),
                 'estado' => trim($_POST['estado']),
                 'empresa_id' => $_SESSION['user_id'],
                 'titulo_err' => '',
                 'descripcion_err' => '',
-                'fecha_err' => ''
+                'competencias_err' => '',
+                'vacantes_err' => '',
+                'fecha_err' => '',
+                'duracion_err' => ''
             ];
 
             if(empty($data['titulo'])){ $data['titulo_err'] = 'Por favor ingrese un título'; }
             if(empty($data['descripcion'])){ $data['descripcion_err'] = 'Por favor ingrese una descripción'; }
             if(empty($data['fecha_limite'])){ $data['fecha_err'] = 'Ingrese fecha límite'; }
+            if(empty($data['duracion'])){ $data['duracion_err'] = 'Ingrese la duración'; }
 
-             if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err'])){
+             if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err']) && empty($data['duracion_err'])){
                  if($this->plazaModel->updatePlaza($data)){
+                     // Log Update
+                     $this->bitacoraModel->log($_SESSION['user_id'], 'UPDATE_PLAZA', 'Actualizó plaza: ' . $data['titulo'] . ' (ID: ' . $id . ')');
+
                      flash('plaza_message', 'Plaza actualizada correctamente');
                      redirect('plazas/manage');
                  } else {
@@ -130,11 +208,16 @@ class Plazas extends Controller {
                 'titulo' => $plaza->titulo,
                 'descripcion' => $plaza->descripcion,
                 'requisitos' => $plaza->requisitos,
+                'competencias_requeridas' => $plaza->competencias_requeridas,
+                'modalidad' => $plaza->modalidad,
+                'cantidad_vacantes' => $plaza->cantidad_vacantes,
                 'fecha_limite' => $plaza->fecha_limite,
+                'duracion' => $plaza->duracion ?? '6 meses',
                 'estado' => $plaza->estado,
                 'titulo_err' => '',
                 'descripcion_err' => '',
-                'fecha_err' => ''
+                'fecha_err' => '',
+                'duracion_err' => ''
             ];
 
             $this->view('plazas/edit', $data);
@@ -145,19 +228,47 @@ class Plazas extends Controller {
     public function show($id){
         $plaza = $this->plazaModel->getPlazaById($id);
         
-        // Verificar si el estudiante ya aplicó
+        if(!$plaza){
+            redirect('pages/notFound');
+        }
+
+        // Verificar si el estudiante ya aplicó o lo tiene en favoritos
         $yaAplico = false;
+        $esFavorito = false;
+        
         if(isLoggedIn() && $_SESSION['user_role'] == 5){ // Estudiante
              $postulacionModel = $this->model('Postulacion');
-             $yaAplico = $postulacionModel->verificarPostulacion($_SESSION['user_id'], $id);
+             // Quick check using new methods if available or implement logic
+             // For now assume using the Plaza model extended logic if available, or just direct SQL if quick
+             $yaAplico = $this->plazaModel->checkApplied($_SESSION['user_id'], $id);
+             $esFavorito = $this->plazaModel->checkFavorite($_SESSION['user_id'], $id);
         }
+
+        // Similares (mismo rubro)
+        $similares = $this->plazaModel->getSimilarPlazas($id, $plaza->rubro ?? 'Tecnología'); // Fallback rubro
 
         $data = [
             'plaza' => $plaza,
-            'yaAplico' => $yaAplico
+            'yaAplico' => $yaAplico,
+            'esFavorito' => $esFavorito,
+            'similares' => $similares
         ];
 
         $this->view('plazas/show', $data);
+    }
+
+    public function toggle_favorite($id){
+        if(!isLoggedIn() || $_SESSION['user_role'] != 5){
+             echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+             return;
+        }
+        
+        if($this->plazaModel->toggleFavorite($_SESSION['user_id'], $id)){
+             $esFavorito = $this->plazaModel->checkFavorite($_SESSION['user_id'], $id);
+             echo json_encode(['status' => 'success', 'favorito' => $esFavorito]);
+        } else {
+             echo json_encode(['status' => 'error']);
+        }
     }
 
     // Aplicar a una plaza (Estudiante)
@@ -228,6 +339,32 @@ class Plazas extends Controller {
 
          $postulacionModel = $this->model('Postulacion');
          if($postulacionModel->actualizarEstado($postulacionId, $status)){
+             // Log Status Change
+             $this->bitacoraModel->log($_SESSION['user_id'], 'UPDATE_APPLICANT', 'Usuario ' . $_SESSION['user_id'] . ' cambió estado de postulación ' . $postulacionId . ' a: ' . $status);
+
+             // IF ACCEPTED -> CREATE PASANTIA
+             if($status == 'aceptada' || $status == 'aceptado'){ 
+                 $postulacion = $postulacionModel->getPostulacionById($postulacionId);
+                 
+                 if($postulacion){
+                     $pasantiaModel = $this->model('Pasantia');
+                     $userModel = $this->model('User');
+                     $userInfo = $userModel->getUserById($_SESSION['user_id']);
+
+                     $dataPasantia = [
+                         'estudiante_id' => $postulacion->estudiante_id,
+                         'empresa_id' => $userInfo->empresa_id,
+                         'tutor_id' => null, // Coordinator will assign
+                         'institucion_id' => 1,
+                         'proyecto_asociado' => 'Pasantía - ' . $plaza->titulo,
+                         'fecha_inicio' => date('Y-m-d'),
+                         'fecha_fin' => date('Y-m-d', strtotime('+6 months')),
+                         'estado' => 'activa'
+                     ];
+                     $pasantiaModel->addPasantia($dataPasantia);
+                 }
+             }
+
              flash('plaza_message', 'Estado del candidato actualizado');
              redirect('plazas/applicants/' . $plazaId);
          } else {

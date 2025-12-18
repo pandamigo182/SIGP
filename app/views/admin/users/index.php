@@ -67,6 +67,25 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination -->
+                <?php if($data['totalPages'] > 1): ?>
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <?php echo $data['page'] <= 1 ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo URLROOT; ?>/admin/users/<?php echo $data['page'] - 1; ?>" tabindex="-1">Anterior</a>
+                        </li>
+                        <?php for($i = 1; $i <= $data['totalPages']; $i++): ?>
+                            <li class="page-item <?php echo $data['page'] == $i ? 'active' : ''; ?>">
+                                <a class="page-link" href="<?php echo URLROOT; ?>/admin/users/<?php echo $i; ?>"><?php echo $i; ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <li class="page-item <?php echo $data['page'] >= $data['totalPages'] ? 'disabled' : ''; ?>">
+                            <a class="page-link" href="<?php echo URLROOT; ?>/admin/users/<?php echo $data['page'] + 1; ?>">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -4,8 +4,9 @@
         <div class="card card-body bg-light mt-5">
             <?php flash('register_success'); ?>
             <h2>Iniciar Sesión</h2>
-            <p>Por favor ingresa tus credenciales</p>
+            <p>Complete sus credenciales</p>
             <form action="<?php echo URLROOT; ?>/auth/login" method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                 <div class="form-group mb-3">
                     <label for="email">Email: <sup>*</sup></label>
                     <input type="email" name="email" class="form-control form-control-lg <?php echo (!empty($data['email_err'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['email']; ?>">

@@ -6,9 +6,41 @@ class Empresa {
         $this->db = new Database;
     }
 
-    // Obtener todas las empresas
-    public function getEmpresas(){
-        $this->db->query("SELECT * FROM empresas ORDER BY nombre ASC");
+    // Obtener todas las empresas (Paginado)
+    public function getEmpresas($limit = 100, $offset = 0, $search = ''){
+        if(!empty($search)){
+             $this->db->query("SELECT * FROM empresas WHERE nombre LIKE :search OR email_contacto LIKE :search ORDER BY nombre ASC LIMIT :limit OFFSET :offset");
+             $this->db->bind(':search', '%'.$search.'%');
+        } else {
+             $this->db->query("SELECT * FROM empresas ORDER BY nombre ASC LIMIT :limit OFFSET :offset");
+        }
+        $this->db->bind(':limit', $limit);
+        $this->db->bind(':offset', $offset);
+        return $this->db->resultSet();
+    }
+
+    public function countEmpresas($search = ''){
+        if(!empty($search)){
+             $this->db->query('SELECT COUNT(*) as total FROM empresas WHERE nombre LIKE :search OR email_contacto LIKE :search');
+             $this->db->bind(':search', '%'.$search.'%');
+        } else {
+             $this->db->query('SELECT COUNT(*) as total FROM empresas');
+        }
+        $row = $this->db->single();
+        return $row->total;
+    }
+
+    // Obtener empresas destacadas (para Home)
+    public function getDestacadas($limit = 5){
+        // Idealmente ordenado por valoración si existiera, o actividad.
+        // Por ahora Random de aquellas que tienen logo
+        $this->db->query("SELECT * FROM empresas WHERE logo_path IS NOT NULL AND logo_path != '' ORDER BY rand() LIMIT :limit");
+        $this->db->bind(':limit', $limit);
+        return $this->db->resultSet();
+    }
+
+    public function getRubros(){
+        $this->db->query("SELECT DISTINCT rubro FROM empresas WHERE rubro IS NOT NULL AND rubro != '' ORDER BY rubro ASC");
         return $this->db->resultSet();
     }
 

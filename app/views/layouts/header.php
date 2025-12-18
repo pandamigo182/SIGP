@@ -4,18 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <?php $sys = function_exists('get_system_settings') ? get_system_settings() : null; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/style.css">
+    <?php if($sys && !empty($sys->favicon_path)): ?>
+        <link rel="icon" href="<?php echo URLROOT; ?>/img/<?php echo $sys->favicon_path; ?>" type="image/x-icon">
+    <?php else: ?>
+        <link rel="icon" href="<?php echo URLROOT; ?>/img/favicon.svg" type="image/svg+xml">
+    <?php endif; ?>
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title><?php echo SITENAME; ?></title>
+    <title><?php echo ($sys && !empty($sys->nombre_sistema)) ? $sys->nombre_sistema : SITENAME; ?></title>
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
+    <style>
+        .text-custom-primary { color: #3f37c9 !important; }
+        .btn-custom-primary { background-color: #3f37c9 !important; border-color: #3f37c9 !important; color: white !important; }
+        .btn-custom-primary:hover { background-color: #4361ee !important; border-color: #4361ee !important; }
+        .nav-link.text-primary { color: #3f37c9 !important; }
+    </style>
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="<?php echo URLROOT; ?>">
-                <i class="fas fa-graduation-cap me-2"></i><?php echo SITENAME; ?>
+            <a class="navbar-brand fw-bold text-custom-primary d-flex align-items-center" href="<?php echo URLROOT; ?>">
+                <?php if($sys && !empty($sys->logo_path)): ?>
+                    <img src="<?php echo URLROOT; ?>/img/<?php echo $sys->logo_path; ?>" alt="Logo" height="35" class="me-2">
+                <?php else: ?>
+                    <img src="<?php echo URLROOT; ?>/img/logo-azul.svg" alt="SIGP" height="35" class="me-2"> 
+                <?php endif; ?>
+                <?php echo ($sys && !empty($sys->nombre_sistema)) ? $sys->nombre_sistema : 'SIGP - Sistema Integral de Gestión de Pasantías'; ?>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
@@ -23,17 +40,13 @@
 
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>"><i class="fas fa-home me-1"></i> Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo URLROOT; ?>/pages/about"><i class="fas fa-info-circle me-1"></i> Nosotros</a>
-                    </li>
+                    <!-- Links removed as requested -->
                 </ul>
 
-                <!-- Date/Time Widget -->
-                <div class="d-none d-lg-block me-3 text-muted small" id="clock-widget">
-                    <i class="far fa-clock"></i> <span id="current-time">--:--</span>
+                <!-- Navigation Link: Pasantías -->
+                <div class="d-flex align-items-center me-3">
+                    <a class="nav-link fw-bold text-custom-primary" href="<?php echo URLROOT; ?>/plazas"><i class="fas fa-briefcase me-1"></i> Pasantías</a>
+                    <a class="nav-link fw-bold text-custom-primary ms-3" href="<?php echo URLROOT; ?>/pages/contact"><i class="fas fa-envelope me-1"></i> Contacto</a>
                 </div>
 
                 <ul class="navbar-nav ms-auto">
@@ -82,15 +95,33 @@
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                                 <!-- User Avatar -->
                                 <?php 
-                                    $avatar = isset($_SESSION['user_foto']) && $_SESSION['user_foto'] != 'default.png' 
-                                            ? URLROOT . '/uploads/avatars/' . $_SESSION['user_foto'] 
-                                            : 'https://ui-avatars.com/api/?name=' . urlencode($_SESSION['user_name']) . '&background=random';
+                                    $avatar = URLROOT . '/uploads/avatars/hombre.svg'; // Default Fallback
+                                    
+                                    if(isset($_SESSION['user_foto']) && !empty($_SESSION['user_foto']) && $_SESSION['user_foto'] != 'default.png') {
+                                        $avatar = URLROOT . '/uploads/avatars/' . $_SESSION['user_foto'];
+                                    } else {
+                                        // Dynamic Default based on Role
+                                        if(isset($_SESSION['user_role'])) {
+                                            if($_SESSION['user_role'] == 2) { // Empresa
+                                                $avatar = URLROOT . '/uploads/avatars/empresa.svg';
+                                            } elseif ($_SESSION['user_role'] == 3 || $_SESSION['user_role'] == 5) { // Estudiante (3 or 5)
+                                                if(isset($_SESSION['user_genero']) && $_SESSION['user_genero'] == 'F') {
+                                                    $avatar = URLROOT . '/uploads/avatars/mujer.svg';
+                                                } else {
+                                                    $avatar = URLROOT . '/uploads/avatars/hombre.svg';
+                                                }
+                                            }
+                                        }
+                                    }
                                 ?>
                                 <img src="<?php echo $avatar; ?>" alt="Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                                 <span><?php echo $_SESSION['user_name']; ?></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                                <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/dashboard"><i class="fas fa-tachometer-alt me-2 text-primary"></i> Dashboard</a></li>
+                                <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/dashboard"><i class="fas fa-tachometer-alt me-2 text-custom-primary"></i> Dashboard</a></li>
+                                <?php if($_SESSION['user_role'] == 4): // Empresa ?>
+                                    <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/pasantias/company_index"><i class="fas fa-user-graduate me-2 text-primary"></i> Mis Pasantes</a></li>
+                                <?php endif; ?>
                                 <li><a class="dropdown-item" href="<?php echo URLROOT; ?>/users/profile"><i class="fas fa-user-cog me-2 text-secondary"></i> Mi Perfil</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="<?php echo URLROOT; ?>/auth/logout"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
@@ -114,7 +145,15 @@
         // Simple Clock
         function updateClock() {
             const now = new Date();
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            // Short format for mobile
+            if(window.innerWidth < 992) {
+                 options.weekday = undefined;
+                 options.year = undefined;
+            } else {
+                 options.weekday = 'short';
+                 options.year = 'numeric';
+            }
             document.getElementById('current-time').textContent = now.toLocaleDateString('es-ES', options);
         }
         setInterval(updateClock, 1000);
