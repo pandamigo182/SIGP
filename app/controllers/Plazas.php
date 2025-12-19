@@ -3,7 +3,7 @@ class Plazas extends Controller {
     public function __construct(){
         $this->plazaModel = $this->model('Plaza');
         $this->userModel = $this->model('User');
-        $this->empresaModel = $this->model('Empresa'); // Load Empresa model for filters
+        $this->empresaModel = $this->model('Empresa'); // Cargar modelo Empresa para filtros
         $this->bitacoraModel = $this->model('Bitacora');
     }
 
@@ -104,7 +104,7 @@ class Plazas extends Controller {
 
             if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err']) && empty($data['duracion_err'])){
                  if($this->plazaModel->addPlaza($data)){
-                     // Log Creation
+                     // Registro de Creación
                      $this->bitacoraModel->log($_SESSION['user_id'], 'CREATE_PLAZA', 'Publicó plaza: ' . $data['titulo']);
 
                      flash('plaza_message', 'Plaza publicada correctamente');
@@ -196,7 +196,7 @@ class Plazas extends Controller {
 
              if(empty($data['titulo_err']) && empty($data['descripcion_err']) && empty($data['fecha_err']) && empty($data['duracion_err'])){
                  if($this->plazaModel->updatePlaza($data)){
-                     // Log Update
+                      // Registro de Actualización
                      $this->bitacoraModel->log($_SESSION['user_id'], 'UPDATE_PLAZA', 'Actualizó plaza: ' . $data['titulo'] . ' (ID: ' . $id . ')');
 
                      flash('plaza_message', 'Plaza actualizada correctamente');
@@ -244,14 +244,14 @@ class Plazas extends Controller {
         
         if(isLoggedIn() && $_SESSION['user_role'] == 5){ // Estudiante
              $postulacionModel = $this->model('Postulacion');
-             // Quick check using new methods if available or implement logic
-             // For now assume using the Plaza model extended logic if available, or just direct SQL if quick
+             // Verificación rápida usando nuevos métodos si están disponibles o implementar lógica
+             // Por ahora asumir lógica extendida del modelo Plaza si está disponible, o SQL directo si es rápido
              $yaAplico = $this->plazaModel->checkApplied($_SESSION['user_id'], $id);
              $esFavorito = $this->plazaModel->checkFavorite($_SESSION['user_id'], $id);
         }
 
         // Similares (mismo rubro)
-        $similares = $this->plazaModel->getSimilarPlazas($id, $plaza->rubro ?? 'Tecnología'); // Fallback rubro
+        $similares = $this->plazaModel->getSimilarPlazas($id, $plaza->rubro ?? 'Tecnología'); // Rubro por defecto
 
         $data = [
             'plaza' => $plaza,
@@ -304,16 +304,19 @@ class Plazas extends Controller {
         }
     }
 
-    // Ver postulantes (Empresa)
+    // Ver postulantes (Empresa/Admin)
     public function applicants($id){
-        if($_SESSION['user_role'] != 4){
+        // Permitir Empresa (4) y Admin (1)
+        if($_SESSION['user_role'] != 4 && $_SESSION['user_role'] != 1){
             redirect('dashboard');
         }
 
         $plaza = $this->plazaModel->getPlazaById($id);
+        
+        if(!$plaza){ redirect('plazas/manage'); }
 
-        // Security check: plaza must belong to logged company
-        if($plaza->empresa_id != $_SESSION['user_id']){
+        // Verificación de seguridad: la plaza debe pertenecer a la empresa conectada (omitir para Admin)
+        if($_SESSION['user_role'] == 4 && $plaza->empresa_id != $_SESSION['user_id']){
             redirect('plazas/manage');
         }
 
@@ -337,18 +340,18 @@ class Plazas extends Controller {
     }
 
     private function update_applicant_status($plazaId, $postulacionId, $status){
-         if($_SESSION['user_role'] != 4){ redirect('dashboard'); }
+         if($_SESSION['user_role'] != 4 && $_SESSION['user_role'] != 1){ redirect('dashboard'); }
          
-         // Verify ownership of plaza
+         // Verificar propiedad de la plaza (omitir para Admin)
          $plaza = $this->plazaModel->getPlazaById($plazaId);
-         if($plaza->empresa_id != $_SESSION['user_id']){ redirect('plazas/manage'); }
+         if($_SESSION['user_role'] == 4 && $plaza->empresa_id != $_SESSION['user_id']){ redirect('plazas/manage'); }
 
          $postulacionModel = $this->model('Postulacion');
          if($postulacionModel->actualizarEstado($postulacionId, $status)){
-             // Log Status Change
+             // Registro de Cambio de Estado
              $this->bitacoraModel->log($_SESSION['user_id'], 'UPDATE_APPLICANT', 'Usuario ' . $_SESSION['user_id'] . ' cambió estado de postulación ' . $postulacionId . ' a: ' . $status);
 
-             // IF ACCEPTED -> CREATE PASANTIA
+             // SI ES ACEPTADO -> CREAR PASANTIA
              if($status == 'aceptada' || $status == 'aceptado'){ 
                  $postulacion = $postulacionModel->getPostulacionById($postulacionId);
                  
@@ -360,7 +363,7 @@ class Plazas extends Controller {
                      $dataPasantia = [
                          'estudiante_id' => $postulacion->estudiante_id,
                          'empresa_id' => $userInfo->empresa_id,
-                         'tutor_id' => null, // Coordinator will assign
+                         'tutor_id' => null, // Coordinador asignará
                          'institucion_id' => 1,
                          'proyecto_asociado' => 'Pasantía - ' . $plaza->titulo,
                          'fecha_inicio' => date('Y-m-d'),

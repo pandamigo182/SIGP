@@ -19,14 +19,14 @@ class Admin extends Controller {
     }
 
     public function dashboard(){
-        // Metrics Queries
-        // Using 'plazas' for job counts. 'pasantias' table does not exist.
+        // Consultas de Métricas
+        // Usando 'plazas' para conteo de vacantes.
         $totalPlazas = $this->db_count('plazas');
         
-        // Active Jobs Proxy: Plazas published in last 60 days
+        // Pasantías Activas: Plazas publicadas en los últimos 60 días
         $activePasantias = $this->db_count('plazas', "WHERE fechaPublicacion > DATE_SUB(NOW(), INTERVAL 60 DAY)"); 
         
-        // Students: Role 5 (as per add/edit logic)
+        // Estudiantes: Rol 5
         $totalStudents = $this->db_count('usuarios', "WHERE role_id = 5"); 
         
         $totalCompanies = $this->db_count('empresas');
@@ -41,7 +41,7 @@ class Admin extends Controller {
         $this->view('admin/dashboard', $data);
     }
     
-    // Helper for counts
+    // Auxiliar para conteos
     private function db_count($table, $where = ''){
         $db = new Database;
         try {
@@ -54,33 +54,64 @@ class Admin extends Controller {
     }
 
     // --- Bitacora Implementation ---
-    public function logs(){
-        $logs = $this->bitacoraModel->getLogs(200); // Get last 200 logs
+    // --- Implementación de Bitácora ---
+    public function logs($page = 1){
+        $limit = 50;
+        $offset = ($page - 1) * $limit;
+
+        $filters = [
+            'search' => isset($_GET['search']) ? trim($_GET['search']) : '',
+            'accion' => isset($_GET['accion']) ? trim($_GET['accion']) : '',
+            'fecha_inicio' => isset($_GET['fecha_inicio']) ? trim($_GET['fecha_inicio']) : '',
+            'fecha_fin' => isset($_GET['fecha_fin']) ? trim($_GET['fecha_fin']) : ''
+        ];
+
+        $logs = $this->bitacoraModel->getLogs($filters, $limit, $offset);
+        $totalLogs = $this->bitacoraModel->countLogs($filters);
+        $totalPages = ceil($totalLogs / $limit);
+        
+        $actions = $this->bitacoraModel->getActions();
+
         $data = [
-            'logs' => $logs
+            'logs' => $logs,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'filters' => $filters,
+            'actions' => $actions
         ];
         $this->view('admin/logs/index', $data);
     }
 
     // --- Plazas (Pasantías) Implementation ---
+    // --- Implementación de Plazas (Pasantías) ---
     public function plazas($page = 1){
         $limit = 10;
         $offset = ($page - 1) * $limit;
         
-        $plazas = $this->plazaModel->getAllPlazasWithStats($limit, $offset);
-        $totalPlazas = $this->plazaModel->countAllPlazas();
+        $filters = [
+            'search' => isset($_GET['search']) ? trim($_GET['search']) : '',
+            'empresa_id' => isset($_GET['empresa_id']) ? trim($_GET['empresa_id']) : ''
+        ];
+
+        $plazas = $this->plazaModel->getAllPlazasWithStats($filters, $limit, $offset);
+        $totalPlazas = $this->plazaModel->countAllPlazas($filters);
         $totalPages = ceil($totalPlazas / $limit);
+        
+        // Obtener Empresas para Filtro
+        $empresas = $this->empresaModel->getEmpresas(1000); // Get all (or limit high)
 
         $data = [
             'plazas' => $plazas,
             'page' => $page,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
+            'filters' => $filters,
+            'empresas' => $empresas
         ];
 
         $this->view('admin/plazas/index', $data);
     }
 
-    // --- Empresas Implementation ---
+    // --- Implementación de Empresas ---
     public function empresas($page = 1){
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -102,10 +133,41 @@ class Admin extends Controller {
     
     public function empresas_add(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             
-            // Handle File Upload
-            $logoPath = 'default_logo.png';
+            // Validar CSRF
+            $this->verifyCsrf();
+
+            // Sanitización y Recolección de Datos
+            $data = [
+                'nombre' => sanitizeString($_POST['nombre'] ?? ''),
+                'descripcion' => sanitizeString($_POST['descripcion'] ?? ''),
+                'direccion' => sanitizeString($_POST['direccion'] ?? ''),
+                'telefono' => sanitizeString($_POST['telefono'] ?? ''),
+                'website' => sanitizeString($_POST['website'] ?? ''),
+                'latitud' => sanitizeString($_POST['latitud'] ?? ''),
+                'longitud' => sanitizeString($_POST['longitud'] ?? ''),
+                'nit' => sanitizeString($_POST['nit'] ?? ''),
+                'email_contacto' => trim($_POST['email_contacto'] ?? ''),
+                'representante_legal' => sanitizeString($_POST['representante_legal'] ?? ''),
+                'rubro' => sanitizeString($_POST['rubro'] ?? ''),
+                'departamento_id' => sanitizeString($_POST['departamento_id'] ?? ''),
+                'municipio_id' => sanitizeString($_POST['municipio_id'] ?? ''),
+                'distrito_id' => sanitizeString($_POST['distrito_id'] ?? ''),
+                'logo_path' => 'default_logo.png', // Default
+                'logo_err' => '',
+                'nombre_err' => '',
+                'email_err' => '',
+                'website_err' => '',
+                'telefono_err' => ''
+            ];
+
+            // Validaciones
+            if(empty($data['nombre'])){ $data['nombre_err'] = 'Ingrese el nombre de la empresa'; }
+            if(!empty($data['email_contacto']) && !validateEmail($data['email_contacto'])){ $data['email_err'] = 'Email inválido'; }
+            if(!empty($data['website']) && !validateUrl($data['website'])){ $data['website_err'] = 'URL inválida (incluya http/https)'; }
+            if(!empty($data['telefono']) && !validatePhone($data['telefono'])){ $data['telefono_err'] = 'Formato de teléfono inválido'; }
+
+            // Manejo de Subida de Archivos
             if(isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK){
                 $fileTmpPath = $_FILES['logo']['tmp_name'];
                 $fileName = $_FILES['logo']['name'];
@@ -113,53 +175,47 @@ class Admin extends Controller {
                 $fileType = $_FILES['logo']['type'];
                 $fileNameCmps = explode(".", $fileName);
                 $fileExtension = strtolower(end($fileNameCmps));
-                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
-                $uploadFileDir = dirname(APPROOT) . '/public/img/logos/';
                 
-                // Create directory if it doesn't exist
-                if (!file_exists($uploadFileDir)) {
-                    mkdir($uploadFileDir, 0755, true);
-                }
-
-                $dest_path = $uploadFileDir . $newFileName;
-                
-                if(move_uploaded_file($fileTmpPath, $dest_path)){
-                    $logoPath = $newFileName;
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                if(in_array($fileExtension, $allowedExtensions)){
+                    $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                    $uploadFileDir = dirname(APPROOT) . '/public/img/logos/';
+                    
+                    if (!file_exists($uploadFileDir)) {
+                        mkdir($uploadFileDir, 0755, true);
+                    }
+                    $dest_path = $uploadFileDir . $newFileName;
+                    if(move_uploaded_file($fileTmpPath, $dest_path)){
+                        $data['logo_path'] = $newFileName;
+                    }
+                } else {
+                    $data['logo_err'] = 'Formato de imagen no válido';
                 }
             }
 
-            $data = [
-                'nombre' => trim($_POST['nombre']),
-                'descripcion' => trim($_POST['descripcion']),
-                'direccion' => trim($_POST['direccion']),
-                'telefono' => trim($_POST['telefono']),
-                'website' => trim($_POST['website']),
-                'latitud' => trim($_POST['latitud']),
-                'longitud' => trim($_POST['longitud']),
-                'nit' => trim($_POST['nit']),
-                'email_contacto' => trim($_POST['email_contacto']),
-                'representante_legal' => trim($_POST['representante_legal']),
-                'rubro' => trim($_POST['rubro']),
-                'departamento_id' => trim($_POST['departamento_id']),
-                'municipio_id' => trim($_POST['municipio_id']),
-                'distrito_id' => trim($_POST['distrito_id']),
-                'logo_path' => $logoPath,
-                'logo' => $logoPath 
-            ];
-            
-            if($this->empresaModel->addEmpresa($data)){
-                // Log Creation
-                $this->bitacoraModel->log($_SESSION['user_id'], 'CREATE_EMPRESA', 'Registró empresa: ' . $data['nombre']);
-
-                flash('admin_message', 'Empresa registrada');
-                redirect('admin/empresas');
+            if(empty($data['nombre_err']) && empty($data['email_err']) && empty($data['website_err']) && empty($data['telefono_err']) && empty($data['logo_err'])){
+                if($this->empresaModel->addEmpresa($data)){
+                    $this->bitacoraModel->log($_SESSION['user_id'], 'CREATE_EMPRESA', 'Registró empresa: ' . $data['nombre']);
+                    flash('admin_message', 'Empresa registrada exitosamente');
+                    redirect('admin/empresas');
+                } else {
+                    die('Error al registrar la empresa en la base de datos');
+                }
             } else {
-                die('Error al registrar la empresa');
+                // Volver a la vista con errores
+                 $departamentos = $this->empresaModel->getDepartamentos();
+                 $data['departamentos'] = $departamentos;
+                 $this->view('admin/empresas/add', $data);
             }
+
         } else {
              $departamentos = $this->empresaModel->getDepartamentos();
              $data = [
-                 'departamentos' => $departamentos
+                 'departamentos' => $departamentos,
+                 'nombre' => '', 'descripcion' => '', 'direccion' => '', 'telefono' => '', 'website' => '',
+                 'latitud' => '', 'longitud' => '', 'nit' => '', 'email_contacto' => '', 'representante_legal' => '', 'rubro' => '',
+                 'departamento_id' => '', 'municipio_id' => '', 'distrito_id' => '',
+                 'nombre_err' => '', 'email_err' => '', 'website_err' => '', 'telefono_err' => '', 'logo_err' => ''
              ];
              $this->view('admin/empresas/add', $data);
         }
@@ -179,9 +235,13 @@ class Admin extends Controller {
 
     public function empresas_edit($id){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+            // Validar CSRF
+            $this->verifyCsrf();
+
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             
-            // Handle File Upload
+            // Manejo de Subida de Archivos
             $logoPath = $_POST['current_logo'];
             if(isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK){
                 $fileTmpPath = $_FILES['logo']['tmp_name'];
@@ -285,6 +345,13 @@ class Admin extends Controller {
         $empresas = $this->empresaModel->getEmpresas();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+            // Validar CSRF
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('admin_message', 'Error de seguridad: Token inválido', 'alert alert-danger');
+                redirect('admin/users');
+                return;
+            }
             
             // Sanitize
             $_POST = filter_input_array(INPUT_POST, [
@@ -589,7 +656,7 @@ class Admin extends Controller {
             redirect('admin/users');
         }
     }
-    // --- Sub-Entities Management ---
+    // --- Gestión de Sub-Entidades ---
 
     public function users_experience_add($userId){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
@@ -634,48 +701,33 @@ class Admin extends Controller {
 
     // Settings
     public function settings(){
-        // Get current settings
+        // Obtener configuración actual
         $settings = $this->settingsModel->getSettings();
         if(!$settings){
              $settings = (object)[
                  'id' => 1, 'nombre_sistema' => '', 'nombre_empresa' => '', 'direccion' => '', 
+                 'departamento_id' => '', 'municipio_id' => '', 'distrito_id' => '',
                  'email' => '', 'telefono' => '', 'whatsapp' => '', 
-                 'facebook' => '', 'instagram' => '', 'twitter' => '', 'linkedin' => '',
-                 'logo_path' => '', 'favicon_path' => ''
+                 'logo_path' => '', 'favicon_path' => '', 'map_embed_url' => '',
+                 'email_alertas' => '', 'email_smtp_host' => '', 'email_smtp_user' => '', 'email_smtp_pass' => '', 'email_smtp_port' => ''
              ];
         }
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
             
-            // Uploads
-            $logoPath = $settings->logo_path;
-            if(!empty($_FILES['logo']['name'])){
-                $imgName = $_FILES['logo']['name'];
-                $imgTmp = $_FILES['logo']['tmp_name'];
-                $imgExt = strtolower(pathinfo($imgName, PATHINFO_EXTENSION));
-                $valid_extensions = array('png', 'jpg', 'jpeg', 'svg');
-                
-                if(in_array($imgExt, $valid_extensions)){
-                     $newName = 'logo_' . time() . '.' . $imgExt;
-                     $uploadDir = '../public/img/'; 
-                     move_uploaded_file($imgTmp, $uploadDir . $newName);
-                     $logoPath = $newName; 
-                }
-            }
+            // Prepare Data with NULL for empty integers
+            $depId = !empty($_POST['departamento_id']) ? $_POST['departamento_id'] : null;
+            $munId = !empty($_POST['municipio_id']) ? $_POST['municipio_id'] : null;
+            $distId = !empty($_POST['distrito_id']) ? $_POST['distrito_id'] : null;
 
-            $faviconPath = $settings->favicon_path;
-            if(!empty($_FILES['favicon']['name'])){
-                $imgName = $_FILES['favicon']['name'];
-                $imgTmp = $_FILES['favicon']['tmp_name'];
-                $imgExt = strtolower(pathinfo($imgName, PATHINFO_EXTENSION));
-                $valid_extensions = array('ico', 'png');
-                
-                if(in_array($imgExt, $valid_extensions)){
-                     $newName = 'favicon_' . time() . '.' . $imgExt;
-                     $uploadDir = '../public/img/'; 
-                     move_uploaded_file($imgTmp, $uploadDir . $newName);
-                     $faviconPath = $newName; 
-                }
+            // Enforce Static Logos as per user request
+            $logoPath = 'logo.svg';
+            $faviconPath = 'favicon.svg';
+            
+            // Map Logic: Extract src from iframe if needed
+            $mapVal = trim($_POST['map_embed_url']);
+            if (preg_match('/src="([^"]+)"/', $mapVal, $match)) {
+                $mapVal = $match[1];
             }
 
             $data = [
@@ -683,14 +735,13 @@ class Admin extends Controller {
                 'nombre_sistema' => trim($_POST['nombre_sistema']),
                 'nombre_empresa' => trim($_POST['nombre_empresa']),
                 'direccion' => trim($_POST['direccion']),
+                'departamento_id' => $depId,
+                'municipio_id' => $munId,
+                'distrito_id' => $distId,
                 'email' => trim($_POST['email']),
                 'telefono' => trim($_POST['telefono']),
                 'whatsapp' => trim($_POST['whatsapp']),
-                'facebook' => trim($_POST['facebook']),
-                'instagram' => trim($_POST['instagram']),
-                'twitter' => trim($_POST['twitter']),
-                'linkedin' => trim($_POST['linkedin']),
-                'map_embed_url' => trim($_POST['map_embed_url']),
+                'map_embed_url' => $mapVal,
                 'email_alertas' => trim($_POST['email_alertas']),
                 'email_smtp_host' => trim($_POST['email_smtp_host']),
                 'email_smtp_user' => trim($_POST['email_smtp_user']),
@@ -701,7 +752,7 @@ class Admin extends Controller {
             ];
 
             if($this->settingsModel->updateSettings($data)){
-                $this->bitacoraModel->logAction($_SESSION['user_id'], 'Actualización', 'Se actualizó la configuración del sistema.');
+                $this->bitacoraModel->log($_SESSION['user_id'], 'UPDATE_SETTINGS', 'Actualizó configuración del sistema');
                 flash('msg_success', 'Configuración actualizada correctamente');
                 redirect('admin/settings');
             } else {
@@ -709,8 +760,10 @@ class Admin extends Controller {
             }
 
         } else {
+            $departamentos = $this->empresaModel->getDepartamentos();
             $data = [
-                'settings' => $settings
+                'settings' => $settings,
+                'departamentos' => $departamentos
             ];
             $this->view('admin/settings/index', $data);
         }

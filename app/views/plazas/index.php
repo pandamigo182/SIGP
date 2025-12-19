@@ -1,61 +1,84 @@
 <?php require APPROOT . '/views/layouts/header.php'; ?>
 
-<!-- Header/Search Section -->
-<div class="py-5 mb-5 border-bottom" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center;">
-    <div class="container">
-        <div class="row justify-content-center text-center mb-4">
-             <div class="col-md-8">
-                 <h1 class="fw-bold mb-3 text-white">Pasantías Disponibles</h1>
-                 <p class="text-light lead">Explora las mejores oportunidades para iniciar tu carrera profesional.</p>
-             </div>
-        </div>
+<!-- Premium Hero Search -->
+<div class="position-relative overflow-hidden" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); padding-top: 5rem; padding-bottom: 8rem; margin-bottom: 2rem;">
+    <!-- Abstract Shapes -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="opacity: 0.1;">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+            <circle cx="0" cy="0" r="40" fill="white" />
+            <circle cx="100" cy="100" r="30" fill="white" />
+        </svg>
+    </div>
 
-        <div class="row justify-content-center">
-             <div class="col-lg-10">
-                 <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <form action="<?php echo URLROOT; ?>/plazas" method="GET">
-                            <div class="row g-2">
-                                <div class="col-md-3">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                        <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Cargo o empresa..." value="<?php echo isset($_GET['q']) ? $_GET['q'] : ''; ?>">
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <select name="rubro" class="form-select">
-                                        <option value="">-- Rubro --</option>
-                                        <?php foreach($data['rubros'] as $rubro) : ?>
-                                            <option value="<?php echo $rubro->rubro; ?>" <?php echo (isset($_GET['rubro']) && $_GET['rubro'] == $rubro->rubro) ? 'selected' : ''; ?>>
-                                                <?php echo $rubro->rubro; ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                   <select name="departamento_id" class="form-select">
-                                       <option value="">-- Departamento --</option>
-                                       <?php foreach($data['departamentos'] as $dep) : ?>
-                                           <option value="<?php echo $dep->id_departamento; ?>" <?php echo (isset($_GET['departamento_id']) && $_GET['departamento_id'] == $dep->id_departamento) ? 'selected' : ''; ?>>
-                                               <?php echo $dep->departamento; ?>
-                                           </option>
-                                       <?php endforeach; ?>
-                                   </select>
-                                </div>
-                                <div class="col-md-3">
-                                     <button type="submit" class="btn btn-primary w-100">Buscar</button>
-                                </div>
-                                <div class="col-md-2">
-                                    <a href="<?php echo URLROOT; ?>/plazas" class="btn btn-outline-secondary w-100">Limpiar</a>
+    <div class="container position-relative z-index-1 text-center">
+        <h1 class="display-4 fw-bold text-white mb-3" style="text-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            Encuentra tu Pasantía Ideal
+        </h1>
+        <p class="lead text-white-50 mx-auto mb-4" style="max-width: 600px;">
+            Explora cientos de oportunidades en las mejores empresas y da el primer paso en tu carrera profesional.
+        </p>
+    </div>
+
+    <!-- Wave Border Bottom -->
+    <div class="position-absolute bottom-0 start-0 w-100" style="line-height: 0;">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="width: 100%; height: 60px; fill: var(--bg-body);">
+            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.5,651.3,1.6,561.08,18.41,478.71,32,364.51,50.83,249.26,69.57,133.58,74.78,92.42,76.62,50.28,75.46,9.15,69.87L0,68.45V120H1200V0C1132.19,23.09,1055.71,74.35,985.66,92.83Z"></path>
+        </svg>
+    </div>
+</div>
+
+<!-- Search Card (Floating Overlay) -->
+<div class="container position-relative z-index-2" style="margin-top: -6rem; mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
+                <div class="card-body p-4 p-lg-5 bg-white">
+                    <form action="<?php echo URLROOT; ?>/plazas" method="GET">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">¿Qué buscas?</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="fas fa-search text-primary"></i></span>
+                                    <input type="text" name="q" class="form-control bg-light border-0" placeholder="Cargo, empresa..." value="<?php echo isset($_GET['q']) ? $_GET['q'] : ''; ?>">
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                 </div>
-             </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Rubro</label>
+                                <select name="rubro" class="form-select bg-light border-0">
+                                    <option value="">Todos</option>
+                                    <?php foreach($data['rubros'] as $rubro) : ?>
+                                        <option value="<?php echo $rubro->rubro; ?>" <?php echo (isset($_GET['rubro']) && $_GET['rubro'] == $rubro->rubro) ? 'selected' : ''; ?>>
+                                            <?php echo $rubro->rubro; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-muted">Ubicación</label>
+                                <select name="departamento_id" class="form-select bg-light border-0">
+                                    <option value="">Todo el país</option>
+                                    <?php foreach($data['departamentos'] as $dep) : ?>
+                                        <option value="<?php echo $dep->id_departamento; ?>" <?php echo (isset($_GET['departamento_id']) && $_GET['departamento_id'] == $dep->id_departamento) ? 'selected' : ''; ?>>
+                                            <?php echo $dep->departamento; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm" style="height: 38px;">Buscar</button>
+                            </div>
+                            <div class="col-12 text-center mt-2">
+                                <a href="<?php echo URLROOT; ?>/plazas" class="text-decoration-none small text-muted"><i class="fas fa-sync-alt me-1"></i> Limpiar filtros</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<div class="mb-5"></div> 
+<!-- Spacer for list -->
 
 <!-- Listado de Plazas -->
 <div class="container mb-5">

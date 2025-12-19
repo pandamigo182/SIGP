@@ -16,38 +16,46 @@ class Users extends Controller {
         $habilidades = $this->studentModel->getAllSkills();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             
-            $data = [
+            // Validación CSRF
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('profile_msg', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+                redirect('users/profile');
+                return;
+            }
+
+            // Sanitización Moderna y Variables en español
+            $datos = [
                 'id' => $userId,
-                'nombre' => trim($_POST['nombre']),
-                'email' => trim($_POST['email']),
-                'password' => trim($_POST['password']),
+                'nombre' => sanitizeString($_POST['nombre'] ?? ''),
+                'email' => trim($_POST['email'] ?? ''), // Read-only usually, but sanitize
+                'password' => trim($_POST['password'] ?? ''),
                 'role_id' => $user->role_id,
                 'foto_perfil' => $user->foto_perfil,
                 
-                // Student Fields
-                'matricula' => trim($_POST['matricula']),
-                'carrera_id' => trim($_POST['carrera_id']),
-                'dui' => trim($_POST['dui']),
-                'edad' => trim($_POST['edad']),
-                'genero' => trim($_POST['genero']),
-                'estado_civil' => trim($_POST['estado_civil']),
-                'telefono' => trim($_POST['telefono']),
-                'direccion' => trim($_POST['direccion']),
-                'departamento' => trim($_POST['departamento']),
-                'municipio' => trim($_POST['municipio']),
-                'institucion' => trim($_POST['institucion']),
-                'nivel_academico' => trim($_POST['nivel_academico']),
-                'estado_ocupacional' => trim($_POST['estado_ocupacional']),
+                // Datos del Estudiante
+                'matricula' => trim($_POST['matricula'] ?? ''),
+                'carrera_id' => trim($_POST['carrera_id'] ?? ''),
+                'dui' => trim($_POST['dui'] ?? ''),
+                'edad' => trim($_POST['edad'] ?? ''),
+                'genero' => trim($_POST['genero'] ?? ''),
+                'estado_civil' => trim($_POST['estado_civil'] ?? ''),
+                'telefono' => sanitizeString($_POST['telefono'] ?? ''),
+                'direccion' => sanitizeString($_POST['direccion'] ?? ''),
+                'departamento' => sanitizeString($_POST['departamento'] ?? ''),
+                'municipio' => sanitizeString($_POST['municipio'] ?? ''),
+                'institucion' => sanitizeString($_POST['institucion'] ?? ''),
+                'nivel_academico' => trim($_POST['nivel_academico'] ?? ''),
+                'estado_ocupacional' => trim($_POST['estado_ocupacional'] ?? ''),
                 'habilidades' => isset($_POST['habilidades']) ? $_POST['habilidades'] : [],
                 
                 'nombre_err' => '',
                 'email_err' => '',
-                'password_err' => ''
+                'password_err' => '',
+                'dui_err' => ''
             ];
 
-             // Handle Avatar Upload
+             // Procesar subida de Avatar
              if(!empty($_FILES['foto']['name'])){
                 $imgName = $_FILES['foto']['name'];
                 $imgSize = $_FILES['foto']['size'];
@@ -58,38 +66,44 @@ class Users extends Controller {
 
                 if(in_array($imgExt, $validExt) && $imgSize < 5000000){
                     $newName = uniqid() . '_avatar.' . $imgExt;
-                    $uploadDir = 'uploads/avatars/';
+                    $uploadDir = 'public/uploads/avatars/'; // Asegurar ruta public
                     if(!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
                     
                     move_uploaded_file($tmpName, $uploadDir . $newName);
-                    $data['foto_perfil'] = $newName;
+                    $datos['foto_perfil'] = $newName;
                 }
             }
 
-            if(empty($data['nombre'])){ $data['nombre_err'] = 'Ingrese nombre'; }
+            if(empty($datos['nombre'])){ $datos['nombre_err'] = 'Ingrese nombre'; }
             
-            // Password logic
-            if(!empty($data['password'])){
-                 if(strlen($data['password']) < 6){
-                     $data['password_err'] = 'Mínimo 6 caracteres';
+            // Lógica de Contraseña
+            if(!empty($datos['password'])){
+                 if(strlen($datos['password']) < 6){
+                     $datos['password_err'] = 'Mínimo 6 caracteres';
                  } 
-                 // Model handles hashing
             }
 
-            if(empty($data['nombre_err']) && empty($data['password_err'])){
-                 // Update Main User
-                 if($this->userModel->updateProfile($data)){
-                     $_SESSION['user_name'] = $data['nombre'];
-                     if($data['foto_perfil']){ $_SESSION['user_foto'] = $data['foto_perfil']; }
+            // Validar DUI
+            if(!empty($datos['dui'])){
+                if(!preg_match('/^\d{8}-\d{1}$/', $datos['dui'])){
+                    $datos['dui_err'] = 'Formato inválido (00000000-0)';
+                }
+            }
 
-                     // Update Student Profile
+            if(empty($datos['nombre_err']) && empty($datos['password_err']) && empty($datos['dui_err'])){
+                 // Actualizar Usuario Principal
+                 if($this->userModel->updateProfile($datos)){
+                     $_SESSION['user_name'] = $datos['nombre'];
+                     if($datos['foto_perfil']){ $_SESSION['user_foto'] = $datos['foto_perfil']; }
+
+                     // Actualizar Perfil de Estudiante
                      if($user->role_id == 5){
-                         $this->studentModel->updateProfile($userId, $data);
-                         $this->studentModel->syncSkills($userId, $data['habilidades']);
+                         $this->studentModel->updateProfile($userId, $datos);
+                         $this->studentModel->syncSkills($userId, $datos['habilidades']);
                          
-                         // CV Upload
+                         // Subida de CV
                          if(isset($_FILES['cv_file']) && $_FILES['cv_file']['error'] === UPLOAD_ERR_OK){
-                             $uploadDir = 'uploads/cvs/';
+                             $uploadDir = 'public/uploads/cvs/';
                              if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
                              $filename = uniqid() . '_' . basename($_FILES['cv_file']['name']);
                              move_uploaded_file($_FILES['cv_file']['tmp_name'], $uploadDir . $filename);
@@ -100,17 +114,22 @@ class Users extends Controller {
                      flash('profile_msg', 'Perfil actualizado correctamente');
                      redirect('users/profile');
                  } else {
-                     die('Error al actualizar');
+                     notify_admins('Error al actualizar perfil usuario ID: ' . $userId);
+                     flash('fatal_error', 'Error crítico al actualizar el perfil.');
+                     redirect('users/profile');
                  }
             } else {
-                // Return errors (Need to fill lists again)
+                 // Devolver errores (Necesario llenar listas de nuevo)
+                 // NOTA: Deberíamos modificar la vista pero mapeamos a $data por compatibilidad
+                 // Por seguridad, mapeamos de nuevo a la estructura $data esperada por la vista
+                 $data = $datos; 
                  $data['carreras'] = $carreras;
                  $data['skills_list'] = $habilidades;
                  $this->view('users/profile', $data);
             }
 
         } else {
-            // Get Student Data
+            // Obtener Datos del Estudiante
             $sProfile = null;
             $sSkills = [];
             $sExperience = [];
@@ -154,7 +173,8 @@ class Users extends Controller {
                 'certificates' => $sCerts,
                 
                 'nombre_err' => '',
-                'password_err' => ''
+                'password_err' => '',
+                'dui_err' => ''
             ];
             $this->view('users/profile', $data);
         }
@@ -163,44 +183,193 @@ class Users extends Controller {
     // Sub-Entities (Experience/Certs)
     public function experience_add(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-            $data = [
+            
+            // Validación CSRF
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('profile_msg', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+                redirect('users/profile');
+                return;
+            }
+
+            // Sanitización
+            $datos = [
                 'usuario_id' => $_SESSION['user_id'],
-                'empresa' => trim($_POST['empresa']),
-                'cargo' => trim($_POST['cargo']),
-                'fecha_inicio' => trim($_POST['fecha_inicio']),
-                'fecha_fin' => trim($_POST['fecha_fin']),
-                'descripcion' => trim($_POST['descripcion'])
+                'empresa' => sanitizeString($_POST['empresa'] ?? ''),
+                'cargo' => sanitizeString($_POST['cargo'] ?? ''),
+                'fecha_inicio' => trim($_POST['fecha_inicio'] ?? ''),
+                'fecha_fin' => trim($_POST['fecha_fin'] ?? ''),
+                'descripcion' => sanitizeString($_POST['descripcion'] ?? '')
             ];
-            $this->studentModel->addExperience($data);
+
+            if($this->studentModel->addExperience($datos)){
+                flash('profile_msg', 'Experiencia agregada correctamente');
+            } else {
+                flash('profile_msg', 'Error al guardar experiencia', 'alert alert-danger');
+            }
             redirect('users/profile');
         }
     }
 
     public function experience_delete($expId){
-         // Verify ownership? Ideally yes.
-         $this->studentModel->deleteExperience($expId);
-         redirect('users/profile');
+         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+             
+             // Validación CSRF
+             if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('profile_msg', 'Token CSRF inválido', 'alert alert-danger');
+                redirect('users/profile');
+                return;
+            }
+
+             // ¿Verificar propiedad? Idealmente sí.
+             $this->studentModel->deleteExperience($expId);
+             flash('profile_msg', 'Experiencia eliminada');
+             redirect('users/profile');
+         } else {
+             // Si se intenta por GET, redirigir
+             redirect('users/profile');
+         }
     }
 
     public function certificate_add(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+             // Validación CSRF
+             if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('profile_msg', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+                redirect('users/profile');
+                return;
+            }
+
              if(isset($_FILES['cert_file']) && $_FILES['cert_file']['error'] === UPLOAD_ERR_OK){
-                 $uploadDir = 'uploads/certificates/';
+                 $uploadDir = 'public/uploads/certificates/'; // Ruta pública explícita
                  if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-                 $filename = uniqid() . '_' . basename($_FILES['cert_file']['name']);
-                 move_uploaded_file($_FILES['cert_file']['tmp_name'], $uploadDir . $filename);
                  
-                 $name = trim($_POST['nombre']);
-                 $this->studentModel->addCertificate($_SESSION['user_id'], $name, $filename);
+                 // Validar extensión
+                 $allowed = ['pdf', 'jpg', 'png', 'jpeg'];
+                 $ext = strtolower(pathinfo($_FILES['cert_file']['name'], PATHINFO_EXTENSION));
+                 
+                 if(in_array($ext, $allowed)){
+                     $filename = uniqid() . '_' . basename($_FILES['cert_file']['name']);
+                     move_uploaded_file($_FILES['cert_file']['tmp_name'], $uploadDir . $filename);
+                     
+                     $nombre = sanitizeString($_POST['nombre'] ?? 'Certificado');
+                     $this->studentModel->addCertificate($_SESSION['user_id'], $nombre, $filename);
+                     flash('profile_msg', 'Certificado subido con éxito');
+                 } else {
+                     flash('profile_msg', 'Formato de archivo no permitido (PDF/IMG)', 'alert alert-danger');
+                 }
              }
              redirect('users/profile');
         }
     }
 
     public function certificate_delete($certId){
-        // Verify ownership?
-        $this->studentModel->deleteCertificate($certId);
-        redirect('users/profile');
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            
+            // Validación CSRF
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('profile_msg', 'Token CSRF inválido', 'alert alert-danger');
+                redirect('users/profile');
+                return;
+            }
+
+            // ¿Verificar propiedad?
+            $this->studentModel->deleteCertificate($certId);
+            flash('profile_msg', 'Certificado eliminado');
+            redirect('users/profile');
+        } else {
+            redirect('users/profile'); 
+        }
+    }
+
+
+    // Security / 2FA Management
+    public function security(){
+        $userId = $_SESSION['user_id'];
+        $user = $this->userModel->getUserById($userId);
+        
+        $data = [
+            'user' => $user,
+            'qr_url' => '',
+            'secret' => '',
+            'error' => ''
+        ];
+        
+        $this->view('users/security', $data);
+    }
+
+    public function enable_2fa_init(){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            require_once APPROOT . '/libraries/GoogleAuthenticator.php';
+            $ga = new GoogleAuthenticator();
+            $secret = $ga->createSecret();
+            
+            // Generate QR info
+            $qrUrl = $ga->getQRCodeGoogleUrl(SITENAME, $secret, $_SESSION['user_email']);
+            
+            // Save temporary secret to session (don't save to DB until confirmed)
+            $_SESSION['2fa_setup_secret'] = $secret;
+            
+            $userId = $_SESSION['user_id'];
+            $user = $this->userModel->getUserById($userId);
+
+            $data = [
+                'user' => $user,
+                'qr_url' => $qrUrl,
+                'secret' => $secret,
+                'error' => '',
+                'setup_mode' => true
+            ];
+            
+            $this->view('users/security', $data);
+        } else {
+            redirect('users/security');
+        }
+    }
+
+    public function confirm_2fa(){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+            $code = trim($_POST['code'] ?? '');
+            $secret = $_SESSION['2fa_setup_secret'] ?? null;
+            
+            if(!$secret){
+                flash('security_msg', 'Sesión de configuración expirada', 'alert alert-danger');
+                redirect('users/security');
+            }
+            
+            require_once APPROOT . '/libraries/GoogleAuthenticator.php';
+            $ga = new GoogleAuthenticator();
+            
+            if($ga->verifyCode($secret, $code, 2)){ // 2 = 60 sec tolerance
+                 // Success - Save to DB
+                 $this->userModel->set2FA($_SESSION['user_id'], $secret);
+                 $this->userModel->toggle2FA($_SESSION['user_id'], 1);
+                 
+                 unset($_SESSION['2fa_setup_secret']);
+                 flash('security_msg', 'Doble autenticación activada correctamente.');
+                 redirect('users/security');
+            } else {
+                 flash('security_msg', 'Código incorrecto. Intenta de nuevo.', 'alert alert-danger');
+                 // Reload view via redirect usually resets data, better to show error.
+                 // For simplicity, redirecting back to init logic or security page.
+                 // But wait, setup mode is ephemeral.
+                 // Let's redirect to security and user has to start over or we handle session.
+                 redirect('users/security');
+            }
+        }
+    }
+
+    public function disable_2fa(){
+        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+             if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('security_msg', 'Token CSRF inválido', 'alert alert-danger');
+                redirect('users/security');
+             }
+
+             $this->userModel->toggle2FA($_SESSION['user_id'], 0);
+             $this->userModel->set2FA($_SESSION['user_id'], null); // Optional: clear secret
+             flash('security_msg', 'Doble autenticación desactivada.');
+             redirect('users/security');
+        }
     }
 }

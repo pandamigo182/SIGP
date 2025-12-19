@@ -1,9 +1,117 @@
 # Sistema Integral de Gestión de Pasantías (SIGP)
 
-![Logo SIGP](public/img/logo-completo.svg)
+![Banner SIGP](public/img/logo-completo.svg)
 
-## Descripción
-SIGP es una plataforma web desarrollada en PHP (MVC) diseñada para optimizar y gestionar el ciclo completo de pasantías universitarias, desde la publicación de ofertas hasta la certificación final del estudiante.
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat-square)
+![PHP](https://img.shields.io/badge/PHP-%5E7.4%20%7C%7C%20%5E8.0-777bb4.svg?style=flat-square&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479a1.svg?style=flat-square&logo=mysql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952b3.svg?style=flat-square&logo=bootstrap&logoColor=white)
+![License](https://img.shields.io/badge/license-Proprietary-red.svg?style=flat-square)
+
+> **Plataforma Enterprise** para la orquestación del ciclo de vida de prácticas profesionales. Diseñada con enfoque en seguridad, escalabilidad y experiencia de usuario.
+
+---
+
+## 🚀 Características Principales
+
+### 👨‍🎓 **Panel del Estudiante**
+- **Perfil Profesional 360°**: Gestión de Curriculum Vitae, habilidades técnicas y blandas.
+- **Búsqueda Inteligente**: Filtrado de ofertas por geolocalización, modalidad (Remoto/Híbrido) y área profesional.
+- **Workflow de Pasantía**: Seguimiento en tiempo real desde la postulación hasta la certificación.
+- **Certificación Automatizada**: Generación de constancias PDF con firma digital al completar exitosamente.
+
+### 🏢 **Portal Corporativo (Empresas)**
+- **Publicación de Vacantes**: Asistente para creación de plazas con perfiles detallados.
+- **Gestión de Talento**: ATS (Applicant Tracking System) ligero para evaluar candidatos.
+- **Evaluación de Desempeño**: Herramientas integradas para realizar evaluaciones de medio y final de término.
+
+### 🛡️ **Núcleo Administrativo**
+- **Gestión RBAC**: Control de acceso basado en roles granular (Admin, Empresa, Estudiante, Tutor).
+- **Auditoría & Logs**: Trazabilidad completa de acciones críticas del sistema.
+- **Motor de Plantillas**: Editor de diplomas y certificados dinámicos.
+
+---
+
+## 🛠️ Stack Tecnológico
+
+*   **Backend**: PHP 8 (Arquitectura MVC Custom sin Frameworks pesados).
+*   **Frontend**: Bootstrap 5, CSS Variables, Vanilla JS (ES6+).
+*   **Base de Datos**: MySQL / MariaDB con diseño relacional (Foreign Keys strict).
+*   **Seguridad**:
+    *   Sanitización de I/O (Input/Output).
+    *   Protección CSRF Global.
+    *   Sentencias Preparadas (PDO) anti-SQLi.
+    *   Gestión de secretos vía `.env`.
+
+---
+
+## ⚙️ Guía de Instalación
+
+### Requisitos
+*   PHP 7.4 o superior
+*   Composer (Opcional, para dependencias futuras)
+*   Servidor Web (Apache/Nginx)
+*   MySQL 5.7+
+
+### Paso a Paso
+
+1.  **Clonar Repositorio**
+    ```bash
+    git clone https://github.com/tu-org/sigp.git
+    cd sigp
+    ```
+
+2.  **Configurar Entorno**
+    ```bash
+    cp .env.example .env
+    # Editar .env con tus credenciales de base de datos
+    ```
+
+3.  **Base de Datos**
+    *   Crear base de datos vacía (ej. `sigp_db`).
+    *   Ejecutar migraciones (Script personalizado):
+    ```bash
+    php migrations/migrate.php
+    ```
+    *(Nota: Si es una instalación limpia, importar primero `public/databases/setup_structure.sql` si existe, o usar los seeders)*.
+
+4.  **Dependencias (Opcional)**
+    ```bash
+    composer install
+    ```
+
+5.  **Despliegue**
+    *   Apuntar el DocumentRoot del servidor web a la carpeta raíz del proyecto.
+    *   Asegurar permisos de escritura en `uploads/`.
+
+---
+
+## 🧪 Testing y Calidad
+
+El proyecto incluye una suite de pruebas automatizadas ligera.
+
+```bash
+# Ejecutar pruebas de integración y unitarias
+php tests/run_tests.php
+```
+
+---
+
+## 📄 Estructura de Directorios
+
+```
+/app            # Núcleo de la aplicación (Controllers, Models, Views)
+/config         # Configuraciones globales
+/migrations     # Scripts de migración de base de datos versionados
+/public         # Entry point (index.php) y assets estáticos (CSS/JS/Img)
+/tests          # Suite de pruebas automatizadas
+/uploads        # Almacenamiento de archivos de usuario
+.env            # Variables de entorno (No versionado)
+```
+
+---
+
+&copy; 2026 SIGP. Desarrollado con ❤️ y estándares de seguridad modernos.
 
 ---
 

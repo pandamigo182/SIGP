@@ -51,18 +51,20 @@ class Pasantias extends Controller {
     public function store_feedback($id){
         if($_SERVER['REQUEST_METHOD'] != 'POST'){ redirect('student/index'); }
 
-         if(!validateCsrfToken($_POST['csrf_token'])){
-             die('Error de seguridad: Token CSRF inválido');
+        if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+             flash('pasantia_message', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+             redirect('student/index'); // Redirect seguro
+             return;
         }
         
         $data = [
             'pasantia_id' => $id,
             'estudiante_id' => $_SESSION['user_id'],
-            'empresa_id' => $_POST['empresa_id'], // Hidden input
-            'rating' => trim($_POST['rating']),
-            'comentarios' => trim($_POST['comentarios']),
-            'satisfaccion' => trim($_POST['satisfaccion']),
-            'recomienda' => trim($_POST['recomienda']),
+            'empresa_id' => trim($_POST['empresa_id'] ?? ''), 
+            'rating' => trim($_POST['rating'] ?? ''),
+            'comentarios' => sanitizeString($_POST['comentarios'] ?? ''),
+            'satisfaccion' => trim($_POST['satisfaccion'] ?? ''), // Si existe en form
+            'recomienda' => trim($_POST['recomienda'] ?? ''),   // Si existe en form
             'rating_err' => ''
         ];
         
@@ -143,8 +145,10 @@ class Pasantias extends Controller {
         if($_SERVER['REQUEST_METHOD'] != 'POST'){ redirect('pasantias/company_index'); }
         if($_SESSION['user_role'] != 4){ redirect('dashboard'); }
 
-        if(!validateCsrfToken($_POST['csrf_token'])){
-             die('Error de seguridad: Token CSRF inválido');
+        if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+             flash('pasantia_message', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+             redirect('pasantias/company_index');
+             return;
         }
 
         // Validate Ownership again
@@ -157,8 +161,8 @@ class Pasantias extends Controller {
         $data = [
             'pasantia_id' => $id,
             'empresa_id' => $_SESSION['user_id'],
-            'rating' => trim($_POST['rating']),
-            'comentarios' => trim($_POST['comentarios']),
+            'rating' => trim($_POST['rating'] ?? ''),
+            'comentarios' => sanitizeString($_POST['comentarios'] ?? ''),
             'criterios' => json_encode($_POST['criterios'] ?? []),
             'rating_err' => '',
             'comentarios_err' => ''
@@ -205,18 +209,37 @@ class Pasantias extends Controller {
         $instituciones = $this->institucionModel->getInstituciones();
         
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
             
+            // Validar CSRF
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                flash('admin_message', 'Error de seguridad: Token CSRF inválido', 'alert alert-danger');
+                redirect('pasantias/add');
+                return;
+            }
+
+            // Sanitización Moderna (Reemplaza FILTER_SANITIZE_STRING)
             $data = [
-                'estudiante_id' => trim($_POST['estudiante_id']),
-                'empresa_id' => trim($_POST['empresa_id']),
-                'tutor_id' => trim($_POST['tutor_id']),
-                'institucion_id' => trim($_POST['institucion_id']),
-                'proyecto_asociado' => trim($_POST['proyecto']),
-                'fecha_inicio' => trim($_POST['fecha_inicio']),
-                'fecha_fin' => trim($_POST['fecha_fin']),
+                'estudiante_id' => trim($_POST['estudiante_id'] ?? ''),
+                'empresa_id' => trim($_POST['empresa_id'] ?? ''),
+                'tutor_id' => trim($_POST['tutor_id'] ?? ''),
+                'institucion_id' => trim($_POST['institucion_id'] ?? ''),
+                'proyecto_asociado' => sanitizeString($_POST['proyecto'] ?? ''),
+                'fecha_inicio' => trim($_POST['fecha_inicio'] ?? ''),
+                'fecha_fin' => trim($_POST['fecha_fin'] ?? ''),
                 'estado' => 'Activa'
             ];
+
+            // Validar campos requeridos básicos (si no se hizo ya en el form)
+            if(empty($data['estudiante_id']) || empty($data['empresa_id']) || empty($data['fecha_inicio']) || empty($data['proyecto_asociado'])){
+                flash('admin_message', 'Por favor complete todos los campos obligatorios', 'alert alert-warning');
+                $this->view('admin/pasantias/add', [
+                    'students' => $students,
+                    'empresas' => $empresas,
+                    'tutors' => $tutors,
+                    'instituciones' => $instituciones
+                ]);
+                return;
+            }
 
             if($this->pasantiaModel->addPasantia($data)){
                 // Notify Student

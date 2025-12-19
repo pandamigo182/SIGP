@@ -8,6 +8,7 @@
             <div class="card-body bg-light">
                 <p>Complete el perfil de su empresa para comenzar a publicar pasantías.</p>
                 <form action="<?php echo URLROOT; ?>/empresas/create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">

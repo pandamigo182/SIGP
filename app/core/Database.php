@@ -7,10 +7,10 @@
  *  Retorna filas y resultados
  */
 class Database {
-    private $host = 'localhost';
-    private $user = 'root';
-    private $pass = 'root';
-    private $dbname = 'sigp_db';
+    private $host = DB_HOST;
+    private $user = DB_USER;
+    private $pass = DB_PASS;
+    private $dbname = DB_NAME;
 
     private $dbh; // Database Handler
     private $stmt;
@@ -83,5 +83,18 @@ class Database {
 
     public function lastInsertId(){
         return $this->dbh->lastInsertId();
+    }
+
+    // Transaction Methods
+    public function beginTransaction(){
+        return $this->dbh->beginTransaction();
+    }
+
+    public function commit(){
+        return $this->dbh->commit();
+    }
+
+    public function rollBack(){
+        return $this->dbh->rollBack();
     }
 }

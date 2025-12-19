@@ -20,7 +20,7 @@ class Tutor extends Controller {
     }
 
     public function view_reports($pasantia_id){
-        // Verify assignment
+        // Verificar asignación
         $pasantia = $this->pasantiaModel->getPasantiaById($pasantia_id);
         if($pasantia->tutor_id != $_SESSION['user_id']){
             redirect('tutor/index');
@@ -42,7 +42,7 @@ class Tutor extends Controller {
             $pasantia_id = filter_input(INPUT_POST, 'pasantia_id', FILTER_SANITIZE_NUMBER_INT);
             $feedback = trim($_POST['retroalimentacion']);
 
-            // Verify Ownership via Pasantia (Optional but strict)
+            // Verificar propiedad vía Pasantía (Opcional pero estricto)
             // ...
 
             if($this->reporteModel->updateRetroalimentacion($reporte_id, $feedback)){

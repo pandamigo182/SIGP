@@ -1,0 +1,13 @@
+# Configuración de Gmail para SMTP
+# 1. Ve a tu cuenta de Google -> Seguridad.
+# 2. Activa la Verificación en 2 Pasos (si no la tienes).
+# 3. Busca "Contraseñas de aplicaciones" (App Passwords).
+# 4. Genera una nueva contraseña para "Correo" y "Ordenador personalizado" (ponle nombre 'SIGP').
+# 5. Copia la contraseña de 16 caracteres.
+
+# En tu .env:
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tu_correo@gmail.com
+SMTP_PASS=xxxx xxxx xxxx xxxx  <-- Tu contraseña de aplicación aquí (sin espacios)
+SMTP_SECURE=tls

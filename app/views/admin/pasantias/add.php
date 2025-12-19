@@ -7,6 +7,7 @@
             </div>
             <div class="card-body">
                 <form action="<?php echo URLROOT; ?>/pasantias/add" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     <div class="mb-3">
                         <label>Estudiante:</label>
                         <select name="estudiante_id" class="form-select" required>

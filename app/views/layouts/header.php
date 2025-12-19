@@ -6,41 +6,37 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <?php $sys = function_exists('get_system_settings') ? get_system_settings() : null; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/style.css">
-    <?php if($sys && !empty($sys->favicon_path)): ?>
-        <link rel="icon" href="<?php echo URLROOT; ?>/img/<?php echo $sys->favicon_path; ?>" type="image/x-icon">
-    <?php else: ?>
-        <link rel="icon" href="<?php echo URLROOT; ?>/img/favicon.svg" type="image/svg+xml">
-    <?php endif; ?>
+    <link rel="icon" href="<?php echo URLROOT; ?>/img/favicon.svg" type="image/svg+xml">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title><?php echo ($sys && !empty($sys->nombre_sistema)) ? $sys->nombre_sistema : SITENAME; ?></title>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <style>
-        .text-custom-primary { color: #3f37c9 !important; }
-        .btn-custom-primary { background-color: #3f37c9 !important; border-color: #3f37c9 !important; color: white !important; }
-        .btn-custom-primary:hover { background-color: #4361ee !important; border-color: #4361ee !important; }
-        .nav-link.text-primary { color: #3f37c9 !important; }
-    </style>
+
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm fixed-top">
         <div class="container">
             <a class="navbar-brand fw-bold text-custom-primary d-flex align-items-center" href="<?php echo URLROOT; ?>">
                 <?php if($sys && !empty($sys->logo_path)): ?>
-                    <img src="<?php echo URLROOT; ?>/img/<?php echo $sys->logo_path; ?>" alt="Logo" height="35" class="me-2">
+                    <img src="<?php echo URLROOT; ?>/img/logo.svg" alt="Logo" height="35" class="me-2">
                 <?php else: ?>
                     <img src="<?php echo URLROOT; ?>/img/logo-azul.svg" alt="SIGP" height="35" class="me-2"> 
                 <?php endif; ?>
                 <?php echo ($sys && !empty($sys->nombre_sistema)) ? $sys->nombre_sistema : 'SIGP - Sistema Integral de Gestión de Pasantías'; ?>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Alternar navegación">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <!-- Links removed as requested -->
+                    <!-- Theme Toggle -->
+                    <li class="nav-item">
+                        <button id="themeToggleBtn" class="theme-toggle-btn m-2" onclick="toggleTheme()" aria-label="Cambiar Tema">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
                 </ul>
 
                 <!-- Navigation Link: Pasantías -->
@@ -57,7 +53,7 @@
                             $notifCount = count($notifs);
                         ?>
                         <li class="nav-item dropdown me-3">
-                            <a class="nav-link text-secondary position-relative" href="#" id="notifDropdown" data-bs-toggle="dropdown">
+                            <a class="nav-link text-secondary position-relative" href="#" id="notifDropdown" data-bs-toggle="dropdown" aria-label="Notificaciones">
                                 <i class="fas fa-bell fa-lg"></i>
                                 <?php if($notifCount > 0): ?>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

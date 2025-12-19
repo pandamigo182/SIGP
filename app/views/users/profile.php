@@ -20,6 +20,7 @@
             </div>
 
             <form action="<?php echo URLROOT; ?>/users/profile" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                 
                 <!-- Basic Info -->
                 <div class="row">
@@ -73,7 +74,8 @@
                                 <div class="row">
                                      <div class="col-md-3 mb-2">
                                          <label for="dui">DUI:</label>
-                                         <input type="text" name="dui" id="dui" class="form-control form-control-sm" value="<?php echo $data['dui']; ?>">
+                                         <input type="text" name="dui" id="dui" class="form-control form-control-sm <?php echo (!empty($data['dui_err'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['dui']; ?>" placeholder="00000000-0">
+                                         <span class="invalid-feedback"><?php echo $data['dui_err']; ?></span>
                                      </div>
                                      <div class="col-md-2 mb-2">
                                          <label for="edad">Edad:</label>
@@ -221,7 +223,10 @@
                                                 <strong><?php echo $exp->empresa; ?></strong><br>
                                                 <small class="text-muted"><?php echo $exp->cargo; ?></small>
                                             </div>
-                                            <a href="<?php echo URLROOT; ?>/users/experience_delete/<?php echo $exp->id; ?>" class="text-danger" onclick="return confirm('Eliminar?');"><i class="fas fa-trash"></i></a>
+                                            <form action="<?php echo URLROOT; ?>/users/experience_delete/<?php echo $exp->id; ?>" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar experiencia?');">
+                                                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                                <button type="submit" class="btn btn-link text-danger p-0 border-0"><i class="fas fa-trash"></i></button>
+                                            </form>
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -246,7 +251,10 @@
                                                 <i class="fas fa-file-pdf text-danger me-2"></i> 
                                                 <a href="<?php echo URLROOT; ?>/uploads/certificates/<?php echo $cert->archivo_path; ?>" target="_blank" class="text-decoration-none text-dark"><?php echo $cert->nombre; ?></a>
                                             </div>
-                                            <a href="<?php echo URLROOT; ?>/users/certificate_delete/<?php echo $cert->id; ?>" class="text-danger" onclick="return confirm('Eliminar?');"><i class="fas fa-trash"></i></a>
+                                            <form action="<?php echo URLROOT; ?>/users/certificate_delete/<?php echo $cert->id; ?>" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar certificado?');">
+                                                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                                                <button type="submit" class="btn btn-link text-danger p-0 border-0"><i class="fas fa-trash"></i></button>
+                                            </form>
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
@@ -264,6 +272,7 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <form action="<?php echo URLROOT; ?>/users/experience_add" method="post">
+                      <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                       <div class="modal-header">
                         <h5 class="modal-title">Agregar Experiencia</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -290,6 +299,7 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <form action="<?php echo URLROOT; ?>/users/certificate_add" method="post" enctype="multipart/form-data">
+                      <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                       <div class="modal-header">
                         <h5 class="modal-title">Agregar Certificado</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

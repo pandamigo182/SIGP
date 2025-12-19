@@ -13,10 +13,63 @@ function flash($name = '', $message = '', $class = 'alert alert-success alert-di
             $_SESSION[$name] = $message;
             $_SESSION[$name. '_class'] = $class;
         } elseif(empty($message) && !empty($_SESSION[$name])){
-            $class = !empty($_SESSION[$name. '_class']) ? $_SESSION[$name. '_class'] : '';
-            echo '<div class="'.$class.'" id="msg-flash" role="alert">'.$_SESSION[$name].'
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>';
+            $class = !empty($_SESSION[$name. '_class']) ? $_SESSION[$name. '_class'] : 'primary';
+            $msg = $_SESSION[$name];
+            
+            // Clean strings for JS
+            $msg = addslashes($msg);
+            
+            // Check for specific fatal error to use SweetAlert
+            if($name == 'fatal_error'){
+                 echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error del Sistema',
+                            text: '$msg',
+                            footer: 'El administrador ha sido notificado.'
+                        });
+                    });
+                  </script>";
+            } elseif($name == 'welcome_msg') {
+                 echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const Toast = Swal.mixin({
+                          toast: true,
+                          position: 'top-end',
+                          showConfirmButton: false,
+                          timer: 3000,
+                          timerProgressBar: true
+                        });
+                        Toast.fire({
+                          icon: 'success',
+                          title: '$msg'
+                        });
+                    });
+                  </script>";
+            } elseif($name == 'logout_msg') {
+                 echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'info',
+                            title: '¡Hasta luego!',
+                            text: '$msg',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    });
+                  </script>";
+            } else {
+                // Toast for others
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            if(typeof showToast === 'function'){
+                                showToast('$msg', '$class');
+                            }
+                        });
+                      </script>";
+            }
+            
             unset($_SESSION[$name]);
             unset($_SESSION[$name. '_class']);
         }

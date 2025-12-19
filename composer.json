@@ -1,0 +1,15 @@
+{
+    "name": "pandamigo182/sigp",
+    "description": "Sistema Integral de Gestión de Pasantías",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "phpmailer/phpmailer": "^7.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}

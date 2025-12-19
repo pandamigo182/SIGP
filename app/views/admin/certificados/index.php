@@ -2,7 +2,10 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h2 class="mb-4"><i class="fas fa-certificate text-primary"></i> Gestión de Diplomas</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="fas fa-certificate text-primary"></i> Gestión de Diplomas</h2>
+            <a href="<?php echo URLROOT; ?>/dashboard" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Volver al Dashboard</a>
+        </div>
         <?php flash('cert_message'); ?>
 
         <div class="row">

@@ -72,20 +72,29 @@ class Empresas extends Controller {
         $empresa = $this->empresaModel->getEmpresaById($empresaId);
 
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            
+            // CSRF Validation
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                 flash('profile_msg', 'Token seguridad inválido', 'alert alert-danger');
+                 redirect('empresas/edit');
+                 return;
+            }
 
+            // Modern Sanitization
             $data = [
                 'id' => $empresaId,
-                'nombre' => trim($_POST['nombre']),
-                'descripcion' => trim($_POST['descripcion']),
-                'direccion' => trim($_POST['direccion']),
-                'telefono' => trim($_POST['telefono']),
-                'website' => trim($_POST['website']),
-                'latitud' => trim($_POST['latitud']),
-                'longitud' => trim($_POST['longitud']),
+                'nombre' => sanitizeString($_POST['nombre'] ?? ''),
+                'descripcion' => sanitizeString($_POST['descripcion'] ?? ''),
+                'direccion' => sanitizeString($_POST['direccion'] ?? ''),
+                'telefono' => sanitizeString($_POST['telefono'] ?? ''),
+                'website' => sanitizeString($_POST['website'] ?? ''), // Could use validateUrl too
+                'latitud' => trim($_POST['latitud'] ?? ''),
+                'longitud' => trim($_POST['longitud'] ?? ''),
                 'logo' => $empresa->logo,
+                'nit' => sanitizeString($_POST['nit'] ?? ''),
                 'nombre_err' => '',
-                'descripcion_err' => ''
+                'descripcion_err' => '',
+                'nit_err' => ''
             ];
 
              // Handle Logo Upload
@@ -111,13 +120,22 @@ class Empresas extends Controller {
 
             if(empty($data['nombre'])){ $data['nombre_err'] = 'Ingrese nombre de la empresa'; }
             if(empty($data['descripcion'])){ $data['descripcion_err'] = 'Ingrese una descripción'; }
+            
+            // Validar NIT
+            if(!empty($data['nit'])){
+                if(!preg_match('/^\d{4}-\d{6}-\d{3}-\d{1}$/', $data['nit'])){
+                    $data['nit_err'] = 'Formato NIT inválido (0000-000000-000-0)';
+                }
+            }
 
-            if(empty($data['nombre_err']) && empty($data['descripcion_err'])){
+            if(empty($data['nombre_err']) && empty($data['descripcion_err']) && empty($data['nit_err'])){
                 if($this->empresaModel->updateEmpresa($data)){
                     flash('profile_msg', 'Perfil de empresa actualizado');
                     redirect('empresas/profile');
                 } else {
-                    die('Error al actualizar');
+                    notify_admins('Error al actualizar empresa ID: ' . $empresaId);
+                    flash('fatal_error', 'Error crítico al actualizar la empresa.');
+                    redirect('empresas/edit');
                 }
             } else {
                 $this->view('empresas/edit', $data);
@@ -134,8 +152,10 @@ class Empresas extends Controller {
                 'latitud' => $empresa->latitud,
                 'longitud' => $empresa->longitud,
                 'logo' => $empresa->logo,
+                'nit' => $empresa->nit,
                 'nombre_err' => '',
-                'descripcion_err' => ''
+                'descripcion_err' => '',
+                'nit_err' => ''
             ];
             $this->view('empresas/edit', $data);
         }
@@ -145,19 +165,28 @@ class Empresas extends Controller {
          if(!isLoggedIn() || $_SESSION['user_role'] != 4){ redirect('dashboard'); }
          
          if($_SERVER['REQUEST_METHOD'] == 'POST'){
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            
+            // CSRF Validation
+            if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
+                 flash('profile_msg', 'Error de seguridad: Token inválido', 'alert alert-danger');
+                 redirect('empresas/create'); // or dashboard
+                 return;
+            }
 
+            // Modern Sanitization
             $data = [
-                'nombre' => trim($_POST['nombre']),
-                'descripcion' => trim($_POST['descripcion']),
-                'direccion' => trim($_POST['direccion']),
-                'telefono' => trim($_POST['telefono']),
-                'website' => trim($_POST['website']),
-                'latitud' => trim($_POST['latitud']),
-                'longitud' => trim($_POST['longitud']),
+                'nombre' => sanitizeString($_POST['nombre'] ?? ''),
+                'descripcion' => sanitizeString($_POST['descripcion'] ?? ''),
+                'direccion' => sanitizeString($_POST['direccion'] ?? ''),
+                'telefono' => sanitizeString($_POST['telefono'] ?? ''),
+                'website' => sanitizeString($_POST['website'] ?? ''),
+                'latitud' => trim($_POST['latitud'] ?? ''),
+                'longitud' => trim($_POST['longitud'] ?? ''),
                 'logo' => 'default_logo.png',
+                'nit' => sanitizeString($_POST['nit'] ?? ''),
                 'nombre_err' => '',
-                'descripcion_err' => ''
+                'descripcion_err' => '',
+                'nit_err' => ''
             ];
 
              // Handle Logo Upload
@@ -176,8 +205,15 @@ class Empresas extends Controller {
             }
 
             if(empty($data['nombre'])){ $data['nombre_err'] = 'Ingrese nombre'; }
+            
+            // Validar NIT
+            if(!empty($data['nit'])){
+                if(!preg_match('/^\d{4}-\d{6}-\d{3}-\d{1}$/', $data['nit'])){
+                     $data['nit_err'] = 'Formato NIT inválido (0000-000000-000-0)';
+                }
+            }
 
-            if(empty($data['nombre_err'])){
+            if(empty($data['nombre_err']) && empty($data['nit_err'])){
                 $newId = $this->empresaModel->addEmpresa($data);
                 if($newId){
                     // Update User to link to this company
@@ -190,7 +226,9 @@ class Empresas extends Controller {
                     flash('profile_msg', 'Empresa creada correctamente');
                     redirect('empresas/profile');
                 } else {
-                    die('Error al crear');
+                    notify_admins('Error al crear empresa');
+                    flash('fatal_error', 'Error crítico al crear la empresa.');
+                    redirect('empresas/create');
                 }
             } else {
                 $this->view('empresas/create', $data);
@@ -205,8 +243,10 @@ class Empresas extends Controller {
                 'website' => '',
                 'latitud' => '',
                 'longitud' => '',
+                'nit' => '',
                 'nombre_err' => '',
-                'descripcion_err' => ''
+                'descripcion_err' => '',
+                'nit_err' => ''
             ];
             $this->view('empresas/create', $data);
          }

@@ -5,10 +5,34 @@
         <h1>Bitácora de Seguridad</h1>
         <p class="text-muted">Registro de auditoría y eventos del sistema.</p>
     </div>
-    <div class="col-md-6">
-        <form action="<?php echo URLROOT; ?>/admin/logs" method="GET" class="d-flex">
-            <input class="form-control me-2" type="search" name="q" placeholder="Buscar por usuario, IP, fecha..." aria-label="Search" value="<?php echo isset($data['search']) ? $data['search'] : ''; ?>">
-            <button class="btn btn-primary" type="submit">Buscar</button>
+    <div class="col-md-12 mt-2">
+        <form action="<?php echo URLROOT; ?>/admin/logs" method="GET" class="card card-body bg-light border-0 shadow-sm">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted">Búsqueda General</label>
+                    <input class="form-control form-control-sm" type="search" name="search" placeholder="Usuario, Email, IP..." value="<?php echo isset($data['filters']['search']) ? $data['filters']['search'] : ''; ?>">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted">Filtrar por Acción</label>
+                    <select name="accion" class="form-select form-select-sm">
+                        <option value="">Todas</option>
+                        <?php foreach($data['actions'] as $act): ?>
+                            <option value="<?php echo $act->accion; ?>" <?php echo ($data['filters']['accion'] == $act->accion) ? 'selected' : ''; ?>><?php echo $act->accion; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Desde</label>
+                    <input type="date" name="fecha_inicio" class="form-control form-control-sm" value="<?php echo $data['filters']['fecha_inicio']; ?>">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted">Hasta</label>
+                    <input type="date" name="fecha_fin" class="form-control form-control-sm" value="<?php echo $data['filters']['fecha_fin']; ?>">
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn-primary btn-sm w-100 fw-bold" type="submit">Filtrar</button>
+                </div>
+            </div>
         </form>
     </div>
 </div>
@@ -30,7 +54,7 @@
                 <tbody>
                     <?php if(empty($data['logs'])): ?>
                         <tr>
-                            <td colspan="6" class="text-center text-muted">No hay registros de auditoría.</td>
+                            <td colspan="6" class="text-center text-muted py-4">No se encontraron registros de auditoría.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach($data['logs'] as $log): ?>
@@ -42,6 +66,8 @@
                                         if(strpos($log->accion, 'LOGIN_SUCCESS') !== false) $badgeClass = 'bg-success';
                                         if(strpos($log->accion, 'LOGIN_FAILED') !== false) $badgeClass = 'bg-danger';
                                         if(strpos($log->accion, 'CREATE') !== false) $badgeClass = 'bg-primary';
+                                        if(strpos($log->accion, 'UPDATE') !== false) $badgeClass = 'bg-info text-dark';
+                                        if(strpos($log->accion, 'DELETE') !== false) $badgeClass = 'bg-danger';
                                         if(strpos($log->accion, 'CSRF') !== false) $badgeClass = 'bg-warning text-dark';
                                     ?>
                                     <span class="badge <?php echo $badgeClass; ?>"><?php echo $log->accion; ?></span>
@@ -73,6 +99,34 @@
             </table>
         </div>
     </div>
+    
+    <!-- Pagination -->
+    <?php 
+        $queryParams = array_filter($data['filters']); // Remove empty
+        $queryString = http_build_query($queryParams);
+        $connector = !empty($queryString) ? '?' : '';
+    ?>
+    <?php if($data['totalPages'] > 1): ?>
+        <div class="card-footer bg-white border-0 py-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item <?php echo $data['page'] <= 1 ? 'disabled' : ''; ?>">
+                         <a class="page-link" href="<?php echo URLROOT; ?>/admin/logs/<?php echo $data['page'] - 1; ?><?php echo $connector . $queryString; ?>">Anterior</a>
+                    </li>
+                    <?php 
+                    // Limit pagination links logic could be redundant, keeping simple
+                    for($i = max(1, $data['page'] - 2); $i <= min($data['page'] + 2, $data['totalPages']); $i++): ?>
+                        <li class="page-item <?php echo $data['page'] == $i ? 'active' : ''; ?>">
+                            <a class="page-link" href="<?php echo URLROOT; ?>/admin/logs/<?php echo $i; ?><?php echo $connector . $queryString; ?>"><?php echo $i; ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <li class="page-item <?php echo $data['page'] >= $data['totalPages'] ? 'disabled' : ''; ?>">
+                         <a class="page-link" href="<?php echo URLROOT; ?>/admin/logs/<?php echo $data['page'] + 1; ?><?php echo $connector . $queryString; ?>">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?php require APPROOT . '/views/layouts/footer.php'; ?>

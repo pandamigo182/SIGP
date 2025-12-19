@@ -57,42 +57,7 @@
                                 </div>
                             </div>
 
-                            <h5 class="mb-4 text-primary border-bottom pb-2">Identidad Visual</h5>
-                            <div class="row align-items-center mb-4">
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold small text-muted d-block">Logotipo del Proyecto</label>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3 p-2 border rounded bg-light text-center" style="width: 100px; height: 100px;">
-                                            <?php if(!empty($data['settings']->logo_path)): ?>
-                                                <img src="<?php echo URLROOT; ?>/img/<?php echo $data['settings']->logo_path; ?>" alt="Logo" style="max-width: 100%; max-height: 100%;">
-                                            <?php else: ?>
-                                                <span class="text-muted small">Sin Logo</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <input type="file" name="logo" class="form-control form-control-sm mb-2" accept=".png, .jpg, .jpeg, .svg">
-                                            <small class="text-muted d-block">Recomendado: PNG Transparente. Max 2MB.</small>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold small text-muted d-block">Favicon</label>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3 p-2 border rounded bg-light text-center" style="width: 60px; height: 60px;">
-                                             <?php if(!empty($data['settings']->favicon_path)): ?>
-                                                <img src="<?php echo URLROOT; ?>/img/<?php echo $data['settings']->favicon_path; ?>" alt="Favicon" style="max-width: 32px;">
-                                            <?php else: ?>
-                                                <span class="text-muted small">N/A</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <input type="file" name="favicon" class="form-control form-control-sm mb-2" accept=".ico, .png">
-                                            <small class="text-muted d-block">Recomendado: .ico o .png (32x32px).</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Contact Tab -->
@@ -120,6 +85,37 @@
                                         <input type="text" name="whatsapp" class="form-control" value="<?php echo $data['settings']->whatsapp; ?>" placeholder="Ej: 50370000000">
                                     </div>
                                 </div>
+                             </div>
+
+                             <h5 class="mb-4 text-primary border-bottom pb-2">Ubicación</h5>
+                             <div class="row mb-4">
+                                <div class="col-md-4 mb-3">
+                                     <label class="form-label fw-bold small text-muted">Departamento</label>
+                                     <select name="departamento_id" id="departamento_id" class="form-select">
+                                         <option value="">Seleccione</option>
+                                         <?php if(isset($data['departamentos'])): ?>
+                                             <?php foreach($data['departamentos'] as $dep): ?>
+                                                 <option value="<?php echo $dep->id_departamento; ?>" <?php echo ($data['settings']->departamento_id == $dep->id_departamento) ? 'selected' : ''; ?>>
+                                                     <?php echo $dep->departamento; ?>
+                                                 </option>
+                                             <?php endforeach; ?>
+                                         <?php endif; ?>
+                                     </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold small text-muted">Municipio</label>
+                                    <select name="municipio_id" id="municipio_id" class="form-select" data-selected="<?php echo $data['settings']->municipio_id; ?>">
+                                        <option value="">Seleccione Departamento</option>
+                                    </select>
+                                </div>
+                                 <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold small text-muted">Distrito</label>
+                                    <select name="distrito_id" id="distrito_id" class="form-select" data-selected="<?php echo $data['settings']->distrito_id; ?>">
+                                        <option value="">Seleccione Municipio</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold small text-muted">Dirección Exacta</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt text-secondary"></i></span>
                                         <input type="text" name="direccion" class="form-control" value="<?php echo $data['settings']->direccion; ?>">
@@ -132,38 +128,11 @@
                                         <span class="input-group-text bg-light"><i class="fas fa-map text-secondary"></i></span>
                                         <input type="text" name="map_embed_url" class="form-control" value="<?php echo isset($data['settings']->map_embed_url) ? $data['settings']->map_embed_url : ''; ?>" placeholder="https://www.google.com/maps/embed?...">
                                     </div>
-                                </div>
-                             </div>
-                             
-                             <h5 class="mb-4 text-primary border-bottom pb-2">Redes Sociales</h5>
-                             <div class="row">
-                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted">Facebook</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="fab fa-facebook-f text-primary"></i></span>
-                                        <input type="text" name="facebook" class="form-control" value="<?php echo $data['settings']->facebook; ?>" placeholder="URL Perfil">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted">Instagram</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="fab fa-instagram text-danger"></i></span>
-                                        <input type="text" name="instagram" class="form-control" value="<?php echo $data['settings']->instagram; ?>" placeholder="URL Perfil">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted">Twitter / X</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="fab fa-twitter text-info"></i></span>
-                                        <input type="text" name="twitter" class="form-control" value="<?php echo $data['settings']->twitter; ?>" placeholder="URL Perfil">
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-bold small text-muted">LinkedIn</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-light"><i class="fab fa-linkedin-in text-primary"></i></span>
-                                        <input type="text" name="linkedin" class="form-control" value="<?php echo $data['settings']->linkedin; ?>" placeholder="URL Perfil">
-                                    </div>
+                                    <?php if(!empty($data['settings']->map_embed_url)): ?>
+                                        <div class="mt-3 border rounded p-1">
+                                            <iframe src="<?php echo $data['settings']->map_embed_url; ?>" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                              </div>
                         </div>
@@ -216,4 +185,81 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Location Selects ---
+        const depSelect = document.getElementById('departamento_id');
+        const munSelect = document.getElementById('municipio_id');
+        const disSelect = document.getElementById('distrito_id');
+
+        // Helper to clear options
+        function clearSelect(select, defaultText) {
+            select.innerHTML = `<option value="">${defaultText}</option>`;
+        }
+
+        function loadMunicipios(depId, selectedMunId = null) {
+            if(!depId) {
+                clearSelect(munSelect, 'Seleccione Departamento primero');
+                clearSelect(disSelect, 'Seleccione Municipio primero');
+                return;
+            }
+            munSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            fetch('<?php echo URLROOT; ?>/admin/get_municipios/' + depId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(munSelect, 'Seleccione');
+                    data.forEach(m => {
+                        let isSelected = (selectedMunId && selectedMunId == m.id_municipio) ? 'selected' : '';
+                        munSelect.innerHTML += `<option value="${m.id_municipio}" ${isSelected}>${m.municipio}</option>`;
+                    });
+                     if(selectedMunId) {
+                         loadDistritos(selectedMunId, disSelect.getAttribute('data-selected'));
+                    }
+                })
+               .catch(err => {
+                   console.error(err);
+                   munSelect.innerHTML = '<option value="">Error al cargar</option>';
+               });
+        }
+
+        function loadDistritos(munId, selectedDisId = null) {
+             if(!munId) {
+                clearSelect(disSelect, 'Seleccione Municipio primero');
+                return;
+            }
+            disSelect.innerHTML = '<option value="">Cargando...</option>';
+            
+            fetch('<?php echo URLROOT; ?>/admin/get_distritos/' + munId)
+                .then(response => response.json())
+                .then(data => {
+                    clearSelect(disSelect, 'Seleccione');
+                    data.forEach(d => {
+                        let isSelected = (selectedDisId && selectedDisId == d.id_distrito) ? 'selected' : '';
+                        disSelect.innerHTML += `<option value="${d.id_distrito}" ${isSelected}>${d.distrito}</option>`;
+                    });
+                })
+               .catch(err => {
+                   console.error(err);
+                   disSelect.innerHTML = '<option value="">Error al cargar</option>';
+               });
+        }
+
+        if(depSelect) {
+            depSelect.addEventListener('change', function() {
+                loadMunicipios(this.value);
+                clearSelect(disSelect, 'Seleccione Municipio primero');
+            });
+            if(depSelect.value) {
+                loadMunicipios(depSelect.value, munSelect.getAttribute('data-selected'));
+            }
+        }
+        if(munSelect) {
+            munSelect.addEventListener('change', function() {
+                loadDistritos(this.value);
+            });
+        }
+    });
+    });
+</script>
 <?php require APPROOT . '/views/layouts/footer.php'; ?>

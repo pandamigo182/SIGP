@@ -1,25 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
+    /* Core Brand Colors */
     --primary-color: #4361ee;
+    --primary-hover: #3f37c9;
     --secondary-color: #3f37c9;
     --accent-color: #4895ef;
-    --light-bg: #f8f9fa;
-    --dark-text: #212529;
+
+    /* Semantic Colors (Light Mode Default) */
+    --bg-body: #f0f2f5;
+    --bg-card: #ffffff;
+    --bg-navbar: #ffffff;
+    --text-main: #212529;
+    --text-muted: #6c757d;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+
+    /* Footer Colors (Light Mode) */
+    --bg-footer: #fcfcfc;
+    --text-footer-head: #212529;
+
+    /* Functional */
+    --success-color: #2ecc71;
+    --info-color: #3498db;
+    --warning-color: #f1c40f;
+    --danger-color: #e74c3c;
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Dark Mode Overrides */
+/* Dark Mode Overrides (Palette: Slate) */
+[data-theme="dark"] {
+    --bg-body: #0f172a;
+    /* Slate 900 */
+    --bg-card: #1e293b;
+    /* Slate 800 */
+    --bg-navbar: #1e293b;
+    /* Slate 800 */
+    --bg-input: #334155;
+    /* Slate 700 */
+
+    --text-main: #f8fafc;
+    /* Slate 50 */
+    --text-muted: #cbd5e1;
+    /* Slate 300 (Increased contrast) */
+
+    --border-color: #334155;
+    /* Slate 700 */
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    /* Deeper shadow */
+
+    --primary-color: #818cf8;
+    /* Indigo 400 (Softer for dark mode) */
+    --primary-hover: #6366f1;
+
+    /* Footer Colors (Dark Mode) */
+    --bg-footer: #0d1b2a;
+    --text-footer-head: #ffffff;
+}
+
+[data-theme="light"] {
+    --bg-input: #ffffff;
 }
 
 body {
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-body);
+    font-family: var(--font-main);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Spinner Overlay */
+#loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
+    /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.spinner-custom {
+    width: 3rem;
+    height: 3rem;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .navbar {
-    background: #ffffff !important;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: var(--bg-navbar) !important;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .navbar-brand {
     font-weight: 700;
     letter-spacing: 1px;
+    color: var(--primary-color) !important;
+}
+
+.nav-link {
+    color: var(--text-main) !important;
 }
 
 .hero-section {
@@ -45,21 +147,22 @@ body {
 }
 
 .card-plaza {
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 15px;
-    background: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--bg-card);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     overflow: hidden;
     height: 100%;
 }
 
 .card-plaza:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 30px var(--shadow-color);
 }
 
 .card-body {
     padding: 1.5rem;
+    color: var(--text-main);
 }
 
 .card-title {
@@ -75,6 +178,27 @@ body {
     font-size: 0.85rem;
 }
 
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--bg-body);
+    color: var(--primary-color);
+}
+
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -83,12 +207,164 @@ body {
     border-radius: 50px;
 }
 
-.btn-primary:hover {
-    background-color: var(--secondary-color);
+.hover-scale {
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.btn-outline-secondary {
-    border-radius: 50px;
-    padding: 0.6rem 1.5rem;
+.hover-scale:hover {
+    transform: scale(1.15);
+}
+
+/* Component Overrides using Variables */
+.form-control,
+.form-select {
+    background-color: var(--bg-input);
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+}
+
+/* Fix Placeholder Color in Dark Mode */
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-main);
+}
+
+.modal-content {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--border-color);
+}
+
+.btn-close {
+    filter: invert(var(--invert-icon, 0));
+    /* Auto-invert based on theme */
+}
+
+[data-theme="dark"] {
+    --invert-icon: 1;
+    /* Invert close buttons to white */
+}
+
+.table {
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+.table> :not(caption)>*>* {
+    background-color: transparent !important;
+    /* Prevent Bootstrap stripes from breaking dark mode */
+    color: var(--text-main);
+    border-bottom-color: var(--border-color);
+}
+
+.dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dropdown-item {
+    color: var(--text-main);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-body);
+    color: var(--primary-color);
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.bg-light {
+    background-color: var(--bg-body) !important;
+    /* Remap bg-light to bg-body in dark mode context */
+    color: var(--text-main) !important;
+}
+
+.bg-white {
+    background-color: var(--bg-card) !important;
+    color: var(--text-main) !important;
+}
+
+/* Custom Utilities using Theme Variables */
+.text-custom-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.btn-custom-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #fff !important;
+    /* Always white text on primary button */
+}
+
+.btn-custom-primary:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+/* Navbar Link Specifics */
+.nav-link.text-custom-primary {
+    color: var(--primary-color) !important;
+}
+
+[data-theme="dark"] .nav-link {
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: var(--bg-footer);
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.footer-title {
+    color: var(--text-footer-head);
     font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem !important;
+}
+
+.footer-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 2px 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+.footer-link:hover {
+    color: var(--primary-color);
+    transform: translateX(5px);
 }

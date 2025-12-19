@@ -184,4 +184,67 @@ class User {
         $this->db->bind(':role_id', $roleId);
         return $this->db->resultSet();
     }
+
+    // Guardar Token de Reset
+    public function saveResetToken($email, $token){
+        // Limpiar tokens anteriores
+        $this->db->query('DELETE FROM password_resets WHERE email = :email');
+        $this->db->bind(':email', $email);
+        $this->db->execute();
+
+        // Insertar nuevo token
+        $this->db->query('INSERT INTO password_resets (email, token, created_at) VALUES (:email, :token, NOW())');
+        $this->db->bind(':email', $email);
+        $this->db->bind(':token', $token);
+        
+        return $this->db->execute();
+    }
+
+    // Verificar Token
+    public function verifyResetToken($email, $token){
+        $this->db->query('SELECT * FROM password_resets WHERE email = :email AND token = :token');
+        $this->db->bind(':email', $email);
+        $this->db->bind(':token', $token);
+        
+        $row = $this->db->single();
+        if($this->db->rowCount() > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Reset Password Final
+    public function resetPassword($email, $password){
+        // 1. Update User Password
+        $this->db->query('UPDATE usuarios SET password = :password WHERE email = :email');
+        $this->db->bind(':password', $password); // Hash should be passed or hashed here. Passing hash for consistency.
+        $this->db->bind(':email', $email);
+        
+        if($this->db->execute()){
+            // 2. Delete Token
+            $this->db->query('DELETE FROM password_resets WHERE email = :email');
+            $this->db->bind(':email', $email);
+            $this->db->execute();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // Seguridad 2FA
+    public function set2FA($id, $secret){
+        $this->db->query('UPDATE usuarios SET secret_2fa = :secret WHERE id = :id');
+        $this->db->bind(':secret', $secret);
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
+
+    public function toggle2FA($id, $status){
+        // Status: 1 = Activo, 0 = Inactivo
+        $this->db->query('UPDATE usuarios SET enable_2fa = :status WHERE id = :id');
+        $this->db->bind(':status', $status);
+        $this->db->bind(':id', $id);
+        return $this->db->execute();
+    }
 }

@@ -30,13 +30,91 @@ class Bitacora {
         return $this->log($usuario_id, $accion, $descripcion);
     }
 
-    // Obtener últimos logs (para Admin)
-    public function getLogs($limit = 100){
-        $this->db->query("SELECT b.*, u.nombre as usuario_nombre, u.email as usuario_email 
-                          FROM bitacora b 
-                          LEFT JOIN usuarios u ON b.usuario_id = u.id 
-                          ORDER BY b.created_at DESC LIMIT :limit");
+    // Obtener logs con filtros (para Admin)
+    public function getLogs($filters = [], $limit = 200, $offset = 0){
+        $sql = "SELECT b.*, u.nombre as usuario_nombre, u.email as usuario_email 
+                FROM bitacora b 
+                LEFT JOIN usuarios u ON b.usuario_id = u.id 
+                WHERE 1=1";
+
+        // Filters
+        if(!empty($filters['search'])){
+            $sql .= " AND (u.nombre LIKE :search OR u.email LIKE :search OR b.ip_address LIKE :search)";
+        }
+        if(!empty($filters['accion'])){
+            $sql .= " AND b.accion = :accion";
+        }
+        if(!empty($filters['fecha_inicio'])){
+            $sql .= " AND DATE(b.created_at) >= :fecha_inicio";
+        }
+        if(!empty($filters['fecha_fin'])){
+            $sql .= " AND DATE(b.created_at) <= :fecha_fin";
+        }
+
+        $sql .= " ORDER BY b.created_at DESC LIMIT :limit OFFSET :offset";
+
+        $this->db->query($sql);
+
+        // Bindings
+        if(!empty($filters['search'])){
+            $this->db->bind(':search', '%' . $filters['search'] . '%');
+        }
+        if(!empty($filters['accion'])){
+            $this->db->bind(':accion', $filters['accion']);
+        }
+        if(!empty($filters['fecha_inicio'])){
+            $this->db->bind(':fecha_inicio', $filters['fecha_inicio']);
+        }
+        if(!empty($filters['fecha_fin'])){
+            $this->db->bind(':fecha_fin', $filters['fecha_fin']);
+        }
+
         $this->db->bind(':limit', $limit);
+        $this->db->bind(':offset', $offset);
+
         return $this->db->resultSet();
+    }
+
+    public function getActions(){
+        $this->db->query("SELECT DISTINCT accion FROM bitacora ORDER BY accion ASC");
+        return $this->db->resultSet();
+    }
+
+    public function countLogs($filters = []){
+        $sql = "SELECT COUNT(*) as total 
+                FROM bitacora b 
+                LEFT JOIN usuarios u ON b.usuario_id = u.id 
+                WHERE 1=1";
+
+        if(!empty($filters['search'])){
+            $sql .= " AND (u.nombre LIKE :search OR u.email LIKE :search OR b.ip_address LIKE :search)";
+        }
+        if(!empty($filters['accion'])){
+            $sql .= " AND b.accion = :accion";
+        }
+        if(!empty($filters['fecha_inicio'])){
+             $sql .= " AND DATE(b.created_at) >= :fecha_inicio";
+        }
+        if(!empty($filters['fecha_fin'])){
+             $sql .= " AND DATE(b.created_at) <= :fecha_fin";
+        }
+
+        $this->db->query($sql);
+
+        if(!empty($filters['search'])){
+            $this->db->bind(':search', '%' . $filters['search'] . '%');
+        }
+        if(!empty($filters['accion'])){
+            $this->db->bind(':accion', $filters['accion']);
+        }
+        if(!empty($filters['fecha_inicio'])){
+            $this->db->bind(':fecha_inicio', $filters['fecha_inicio']);
+        }
+        if(!empty($filters['fecha_fin'])){
+            $this->db->bind(':fecha_fin', $filters['fecha_fin']);
+        }
+
+        $row = $this->db->single();
+        return $row->total;
     }
 }

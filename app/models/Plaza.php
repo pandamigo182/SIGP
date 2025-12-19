@@ -43,13 +43,14 @@ class Plaza {
         }
 
         $sql .= " ORDER BY plazas.created_at DESC";
-
+        
+        // Always add LIMIT/OFFSET placeholders if provided
         if($limit){
-            $sql .= " LIMIT $limit";
+            $sql .= " LIMIT :limit";
         }
         
         if($offset){
-            $sql .= " OFFSET $offset";
+            $sql .= " OFFSET :offset";
         }
 
         $this->db->query($sql);
@@ -66,6 +67,14 @@ class Plaza {
         }
         if(!empty($filters['municipio_id'])){
             $this->db->bind(':muni', $filters['municipio_id']);
+        }
+
+        // Bind Pagination
+        if($limit){
+            $this->db->bind(':limit', (int)$limit, PDO::PARAM_INT);
+        }
+        if($offset){
+            $this->db->bind(':offset', (int)$offset, PDO::PARAM_INT);
         }
 
         return $this->db->resultSet();
@@ -237,22 +246,72 @@ class Plaza {
     }
 
     // Admin: Get All Plazas with Stats
-    public function getAllPlazasWithStats($limit = 10, $offset = 0){
+    public function getAllPlazasWithStats($filters = [], $limit = 10, $offset = 0){
         $sql = "SELECT p.*, e.nombre as empresa_nombre, e.logo_path as empresa_logo, 
                 (SELECT COUNT(*) FROM postulaciones WHERE plaza_id = p.id) as total_postulaciones
                 FROM plazas p
                 JOIN usuarios u ON p.empresa_id = u.id
                 JOIN empresas e ON u.empresa_id = e.id
-                ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
+                WHERE 1=1";
+
+        if(!empty($filters['search'])){
+            $sql .= " AND (p.titulo LIKE :search OR e.nombre LIKE :search)";
+        }
+        if(!empty($filters['empresa_id'])){
+            $sql .= " AND e.id = :empresa_id";
+        }
+
+        $sql .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
+        
         $this->db->query($sql);
+        
+        if(!empty($filters['search'])){
+            $this->db->bind(':search', '%' . $filters['search'] . '%');
+        }
+        if(!empty($filters['empresa_id'])){
+             $this->db->bind(':empresa_id', $filters['empresa_id']);
+        }
+
         $this->db->bind(':limit', $limit);
         $this->db->bind(':offset', $offset);
         return $this->db->resultSet();
     }
 
-    public function countAllPlazas(){
-        $this->db->query("SELECT COUNT(*) as total FROM plazas");
+    public function countAllPlazas($filters = []){
+        $sql = "SELECT COUNT(*) as total 
+                FROM plazas p
+                JOIN usuarios u ON p.empresa_id = u.id
+                JOIN empresas e ON u.empresa_id = e.id
+                WHERE 1=1";
+
+        if(!empty($filters['search'])){
+            $sql .= " AND (p.titulo LIKE :search OR e.nombre LIKE :search)";
+        }
+        if(!empty($filters['empresa_id'])){
+            $sql .= " AND e.id = :empresa_id";
+        }
+
+        $this->db->query($sql);
+
+        if(!empty($filters['search'])){
+            $this->db->bind(':search', '%' . $filters['search'] . '%');
+        }
+        if(!empty($filters['empresa_id'])){
+             $this->db->bind(':empresa_id', $filters['empresa_id']);
+        }
+
         $row = $this->db->single();
         return $row->total;
+    }
+
+    public function getApplicants($plazaId){
+        $this->db->query("SELECT p.*, u.nombre as usuario_nombre, u.email as usuario_email, cv.archivo_path as cv_path 
+                          FROM postulaciones p 
+                          JOIN usuarios u ON p.user_id = u.id 
+                          LEFT JOIN curriculums cv ON p.cv_id = cv.id 
+                          WHERE p.plaza_id = :plaza_id 
+                          ORDER BY p.fecha_postulacion DESC");
+        $this->db->bind(':plaza_id', $plazaId);
+        return $this->db->resultSet();
     }
 }

@@ -10,6 +10,7 @@
             </div>
             <div class="card-body">
                 <form action="<?php echo URLROOT; ?>/admin/empresas_add" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label>Nombre de la Empresa:</label>

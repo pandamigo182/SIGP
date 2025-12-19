@@ -10,6 +10,31 @@
     </div>
 </div>
 
+<div class="card mb-4 border-0 shadow-sm bg-light">
+    <div class="card-body">
+        <form action="<?php echo URLROOT; ?>/reportes/index" method="GET" class="row g-2 align-items-end">
+             <div class="col-md-6">
+                 <label class="form-label small fw-bold text-muted">Búsqueda General</label>
+                 <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Estudiante, Título..." value="<?php echo isset($data['filters']['search']) ? $data['filters']['search'] : ''; ?>">
+                 </div>
+             </div>
+             <div class="col-md-4">
+                 <label class="form-label small fw-bold text-muted">Estado</label>
+                 <select name="estado" class="form-select">
+                     <option value="">Todos</option>
+                     <option value="pendiente" <?php echo ($data['filters']['estado'] == 'pendiente') ? 'selected' : ''; ?>>Pendiente</option>
+                     <option value="revisado" <?php echo ($data['filters']['estado'] == 'revisado') ? 'selected' : ''; ?>>Revisado</option>
+                 </select>
+             </div>
+             <div class="col-md-2">
+                 <button type="submit" class="btn btn-primary w-100 fw-bold">Filtrar</button>
+             </div>
+        </form>
+    </div>
+</div>
+
 <div class="card shadow-sm border-0">
     <div class="card-body">
         <?php if(empty($data['reportes'])): ?>

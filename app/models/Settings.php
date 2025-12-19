@@ -16,13 +16,12 @@ class Settings {
             nombre_sistema = :nombre_sistema,
             nombre_empresa = :nombre_empresa,
             direccion = :direccion,
+            departamento_id = :departamento_id,
+            municipio_id = :municipio_id,
+            distrito_id = :distrito_id,
             email = :email,
             telefono = :telefono,
             whatsapp = :whatsapp,
-            facebook = :facebook,
-            instagram = :instagram,
-            twitter = :twitter,
-            linkedin = :linkedin,
             map_embed_url = :map_embed_url,
             email_alertas = :email_alertas,
             email_smtp_host = :email_smtp_host,
@@ -37,13 +36,12 @@ class Settings {
         $this->db->bind(':nombre_sistema', $data['nombre_sistema']);
         $this->db->bind(':nombre_empresa', $data['nombre_empresa']);
         $this->db->bind(':direccion', $data['direccion']);
+        $this->db->bind(':departamento_id', $data['departamento_id']);
+        $this->db->bind(':municipio_id', $data['municipio_id']);
+        $this->db->bind(':distrito_id', $data['distrito_id']);
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':telefono', $data['telefono']);
         $this->db->bind(':whatsapp', $data['whatsapp']);
-        $this->db->bind(':facebook', $data['facebook']);
-        $this->db->bind(':instagram', $data['instagram']);
-        $this->db->bind(':twitter', $data['twitter']);
-        $this->db->bind(':linkedin', $data['linkedin']);
         $this->db->bind(':map_embed_url', $data['map_embed_url']);
         $this->db->bind(':email_alertas', $data['email_alertas']);
         $this->db->bind(':email_smtp_host', $data['email_smtp_host']);

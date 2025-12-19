@@ -28,7 +28,7 @@ function validatePhone($phone) {
     return preg_match('/^[0-9\-\+\s\(\)]+$/', $phone);
 }
 
-function sanitizeString($str) {
-    // Reemplaza FILTER_SANITIZE_STRING que está obsoleto en PHP 8.1+
-    return htmlspecialchars(strip_tags(trim($str)));
+function validateUrl($url) {
+    return filter_var($url, FILTER_VALIDATE_URL);
 }
+

@@ -7,14 +7,20 @@
             </div>
             <div class="card-body bg-light">
                 <form action="<?php echo URLROOT; ?>/empresas/edit" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                     
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label for="nombre">Nombre de la Empresa <sup>*</sup></label>
                             <input type="text" name="nombre" class="form-control <?php echo (!empty($data['nombre_err'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['nombre']; ?>">
                             <span class="invalid-feedback"><?php echo $data['nombre_err']; ?></span>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <label for="nit">NIT (0000-000000-000-0)</label>
+                            <input type="text" name="nit" class="form-control <?php echo (!empty($data['nit_err'])) ? 'is-invalid' : ''; ?>" value="<?php echo $data['nit']; ?>" placeholder="0000-000000-000-0">
+                            <span class="invalid-feedback"><?php echo $data['nit_err']; ?></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
                              <label for="telefono">Teléfono</label>
                              <input type="text" name="telefono" class="form-control" value="<?php echo $data['telefono']; ?>">
                         </div>

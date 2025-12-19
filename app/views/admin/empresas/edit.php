@@ -10,6 +10,7 @@
         <div class="card card-body bg-white shadow-sm rounded-3 mb-5">
             <form action="<?php echo URLROOT; ?>/admin/empresas_edit/<?php echo $data['empresa']->id; ?>" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="current_logo" value="<?php echo $data['empresa']->logo_path; ?>">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                 
                 <h5 class="text-secondary border-bottom pb-2 mb-3">Información General</h5>
 
@@ -96,8 +97,8 @@
                          <select name="departamento_id" id="departamento_id" class="form-select">
                              <option value="">Seleccione</option>
                              <?php foreach($data['departamentos'] as $dep): ?>
-                                 <option value="<?php echo $dep->id; ?>" <?php echo ($data['empresa']->departamento_id == $dep->id) ? 'selected' : ''; ?>>
-                                     <?php echo $dep->nombre; ?>
+                                 <option value="<?php echo $dep->id_departamento; ?>" <?php echo ($data['empresa']->departamento_id == $dep->id_departamento) ? 'selected' : ''; ?>>
+                                     <?php echo $dep->departamento; ?>
                                  </option>
                              <?php endforeach; ?>
                          </select>
@@ -131,54 +132,87 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- Logo Preview ---
+        const logoInput = document.querySelector('input[name="logo"]');
+        const logoPreview = document.querySelector('.img-thumbnail');
+        
+        if(logoInput && logoPreview){
+            logoInput.addEventListener('change', function(e){
+                const file = e.target.files[0];
+                if(file){
+                    const reader = new FileReader();
+                    reader.onload = function(e){
+                        logoPreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // --- Location Selects ---
         const depSelect = document.getElementById('departamento_id');
         const munSelect = document.getElementById('municipio_id');
         const disSelect = document.getElementById('distrito_id');
 
+        // Helper to clear options
+        function clearSelect(select, defaultText) {
+            select.innerHTML = `<option value="">${defaultText}</option>`;
+        }
+
         function loadMunicipios(depId, selectedMunId = null) {
             if(!depId) {
-                munSelect.innerHTML = '<option value="">Seleccione Departamento primero</option>';
-                 disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+                clearSelect(munSelect, 'Seleccione Departamento primero');
+                clearSelect(disSelect, 'Seleccione Municipio primero');
                 return;
             }
             munSelect.innerHTML = '<option value="">Cargando...</option>';
+            
             fetch('<?php echo URLROOT; ?>/admin/get_municipios/' + depId)
                 .then(response => response.json())
                 .then(data => {
-                    munSelect.innerHTML = '<option value="">Seleccione</option>';
+                    clearSelect(munSelect, 'Seleccione');
                     data.forEach(m => {
-                        let isSelected = (selectedMunId && selectedMunId == m.id) ? 'selected' : '';
-                        munSelect.innerHTML += `<option value="${m.id}" ${isSelected}>${m.nombre}</option>`;
+                        // DB Columns: id_municipio, municipio
+                        let isSelected = (selectedMunId && selectedMunId == m.id_municipio) ? 'selected' : '';
+                        munSelect.innerHTML += `<option value="${m.id_municipio}" ${isSelected}>${m.municipio}</option>`;
                     });
                      if(selectedMunId) {
                          loadDistritos(selectedMunId, disSelect.getAttribute('data-selected'));
                     }
                 })
-               .catch(err => console.error(err));
+               .catch(err => {
+                   console.error(err);
+                   munSelect.innerHTML = '<option value="">Error al cargar</option>';
+               });
         }
 
         function loadDistritos(munId, selectedDisId = null) {
              if(!munId) {
-                disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+                clearSelect(disSelect, 'Seleccione Municipio primero');
                 return;
             }
             disSelect.innerHTML = '<option value="">Cargando...</option>';
-            fetch('<?php echo URLROOT; ?>/admin/get_distritos/' + munId) // Ensure this route exists
+            
+            fetch('<?php echo URLROOT; ?>/admin/get_distritos/' + munId)
                 .then(response => response.json())
                 .then(data => {
-                    disSelect.innerHTML = '<option value="">Seleccione</option>';
+                    clearSelect(disSelect, 'Seleccione');
                     data.forEach(d => {
-                        let isSelected = (selectedDisId && selectedDisId == d.id) ? 'selected' : '';
-                        disSelect.innerHTML += `<option value="${d.id}" ${isSelected}>${d.nombre}</option>`;
+                        // DB Columns: id_distrito, distrito
+                        let isSelected = (selectedDisId && selectedDisId == d.id_distrito) ? 'selected' : '';
+                        disSelect.innerHTML += `<option value="${d.id_distrito}" ${isSelected}>${d.distrito}</option>`;
                     });
                 })
-               .catch(err => console.error(err));
+               .catch(err => {
+                   console.error(err);
+                   disSelect.innerHTML = '<option value="">Error al cargar</option>';
+               });
         }
 
         if(depSelect) {
             depSelect.addEventListener('change', function() {
                 loadMunicipios(this.value);
-                 disSelect.innerHTML = '<option value="">Seleccione Municipio primero</option>';
+                clearSelect(disSelect, 'Seleccione Municipio primero');
             });
             if(depSelect.value) {
                 loadMunicipios(depSelect.value, munSelect.getAttribute('data-selected'));
@@ -188,6 +222,23 @@
             munSelect.addEventListener('change', function() {
                 loadDistritos(this.value);
             });
+        }
+
+        // --- NIT Validation / Masking ---
+        const nitInput = document.querySelector('input[name="nit"]');
+        if(nitInput){
+            nitInput.addEventListener('input', function(e){
+                let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                let formatted = '';
+                
+                if(value.length > 0) formatted += value.substring(0, 4);
+                if(value.length > 4) formatted += '-' + value.substring(4, 10);
+                if(value.length > 10) formatted += '-' + value.substring(10, 13);
+                if(value.length > 13) formatted += '-' + value.substring(13, 14);
+                
+                e.target.value = formatted;
+            });
+            nitInput.maxLength = 17; // 0000-000000-000-0
         }
     });
 </script>

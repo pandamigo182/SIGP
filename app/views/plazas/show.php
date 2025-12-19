@@ -5,7 +5,7 @@
     <div class="container position-relative z-index-1">
         <div class="row align-items-center">
              <div class="col-12 mb-3">
-                 <a href="javascript:history.back()" class="text-white text-decoration-none small"><i class="fas fa-arrow-left me-1"></i> Regresar</a>
+                 <!-- Back button removed -->
              </div>
              <div class="col-md-3 text-center text-md-start mb-3 mb-md-0">
                   <?php 
@@ -37,7 +37,7 @@
                      <button class="btn btn-light btn-lg rounded-pill shadow-sm px-4 fw-bold mb-2 w-100" data-bs-toggle="modal" data-bs-target="#applyModal" <?php echo $data['yaAplico'] ? 'disabled' : ''; ?>>
                          <?php echo $data['yaAplico'] ? '<i class="fas fa-check"></i> Aplicado' : 'Aplicar Ahora'; ?>
                      </button>
-                     <button class="btn btn-outline-light rounded-pill w-100" id="btnFavorite" onclick="toggleFavorite(<?php echo $data['plaza']->plazaId; ?>)">
+                     <button class="btn btn-outline-light rounded-pill w-100" id="btnFavorite" onclick="toggleFavorite(<?php echo $data['plaza']->id; ?>)">
                          <i class="<?php echo $data['esFavorito'] ? 'fas' : 'far'; ?> fa-heart"></i> Guardar
                      </button>
                  <?php else: ?>
@@ -89,7 +89,7 @@
                      <!-- Company Card -->
                      <div class="card border-0 shadow-sm mb-4 bg-light">
                          <div class="card-body text-center p-4">
-                             <h5 class="fw-bold mb-3 text-dark">Sobre la Empresa</h5>
+                             <h5 class="fw-bold mb-3">Sobre la Empresa</h5>
                              <img src="<?php echo !empty($data['plaza']->logoEmpresa) ? URLROOT . '/' . $data['plaza']->logoEmpresa : 'https://ui-avatars.com/api/?name=' . urlencode($data['plaza']->nombreEmpresa); ?>" class="rounded-circle mb-3 border shadow-sm" width="80" height="80" style="object-fit:cover;">
                              <h6 class="fw-bold"><?php echo $data['plaza']->nombreEmpresa; ?></h6>
                              
@@ -110,12 +110,49 @@
                      <!-- Share Widget -->
                      <div class="card border-0 shadow-sm">
                          <div class="card-body p-4 text-center">
-                             <h6 class="fw-bold mb-3">Compartir esta oferta</h6>
+                            <h6 class="fw-bold mb-3">Compartir esta oferta</h6>
+                             <?php 
+                                 // URL Base limpia
+                                 $cleanUrl = URLROOT . "/plazas/show/" . $data['plaza']->id;
+                                 $encodedUrl = urlencode($cleanUrl);
+                                 
+                                 // Mensajes Personalizados con Emojis
+                                 $titulo = $data['plaza']->titulo;
+                                 $empresa = $data['plaza']->nombreEmpresa;
+                                 
+                                 // Formato WhatsApp (Más ameno y estructurado)
+                                 $waText = "🚀 *¡Nueva Oportunidad Laboral!* \n\n";
+                                 $waText .= "💼 Puesto: *$titulo* \n";
+                                 $waText .= "🏢 Empresa: *$empresa* \n\n";
+                                 $waText .= "✨ ¡No dejes pasar esta chance! Aplica aquí 👇 \n";
+                                 $waText .= $cleanUrl;
+                                 
+                                 // Formato Twitter/X (Corto y directo)
+                                 $twText = "🚀 Oportunidad: $titulo en $empresa. \n\n💼 ¡Postúlate ahora! ✨ #Empleo #Pasantias #$empresa";
+                                 
+                                 // Formato General (Facebook/LinkedIn)
+                                 $genText = "🚀 ¡Increíble oportunidad laboral! $titulo en $empresa. ¿Buscas iniciar tu carrera? ¡Esta es tu chance! 💼✨";
+                             ?>
                              <div class="d-flex justify-content-center gap-2">
-                                 <button class="btn btn-light rounded-circle text-primary shadow-sm" style="width:40px;height:40px;"><i class="fab fa-facebook-f"></i></button>
-                                 <button class="btn btn-light rounded-circle text-info shadow-sm" style="width:40px;height:40px;"><i class="fab fa-twitter"></i></button>
-                                 <button class="btn btn-light rounded-circle text-primary shadow-sm" style="width:40px;height:40px;"><i class="fab fa-linkedin-in"></i></button>
-                                 <button class="btn btn-light rounded-circle text-success shadow-sm" style="width:40px;height:40px;"><i class="fab fa-whatsapp"></i></button>
+                                 <!-- Facebook -->
+                                 <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo $encodedUrl; ?>&quote=<?php echo urlencode($genText); ?>" target="_blank" class="btn btn-light rounded-circle text-primary shadow-sm hover-scale" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;" aria-label="Compartir en Facebook">
+                                     <i class="fab fa-facebook-f"></i>
+                                 </a>
+                                 
+                                 <!-- X (Twitter) -->
+                                 <a href="https://twitter.com/intent/tweet?text=<?php echo urlencode($twText); ?>&url=<?php echo $encodedUrl; ?>" target="_blank" class="btn btn-light rounded-circle text-dark shadow-sm hover-scale" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;" aria-label="Compartir en X">
+                                     <i class="fa-brands fa-x-twitter"></i>
+                                 </a>
+                                 
+                                 <!-- LinkedIn -->
+                                 <a href="https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $encodedUrl; ?>" target="_blank" class="btn btn-light rounded-circle text-primary shadow-sm hover-scale" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;" aria-label="Compartir en LinkedIn">
+                                     <i class="fab fa-linkedin-in"></i>
+                                 </a>
+                                 
+                                 <!-- WhatsApp -->
+                                 <a href="https://api.whatsapp.com/send?text=<?php echo urlencode($waText); ?>" target="_blank" class="btn btn-light rounded-circle text-success shadow-sm hover-scale" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;" aria-label="Compartir en WhatsApp">
+                                     <i class="fab fa-whatsapp"></i>
+                                 </a>
                              </div>
                          </div>
                      </div>
@@ -172,7 +209,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4 bg-light">
-                 <form action="<?php echo URLROOT; ?>/plazas/apply/<?php echo $data['plaza']->plazaId; ?>" method="POST">
+                 <form action="<?php echo URLROOT; ?>/plazas/apply/<?php echo $data['plaza']->id; ?>" method="POST">
                      <p class="text-muted mb-4">Estás aplicando a <strong><?php echo $data['plaza']->nombreEmpresa; ?></strong>. Selecciona tu CV y responde las preguntas si existen.</p>
                      
                      <div class="card border-0 shadow-sm mb-4">
@@ -198,7 +235,7 @@
                      <!-- Mock Questions -->
                      <div class="card border-0 shadow-sm mb-4">
                          <div class="card-body">
-                             <h6 class="fw-bold text-dark mb-3">Preguntas de la Empresa</h6>
+                             <h6 class="fw-bold mb-3">Preguntas de la Empresa</h6>
                              <div class="mb-3">
                                  <label class="form-label small fw-bold">¿Zona de residencia?</label>
                                  <input type="text" name="q1" class="form-control" placeholder="Ej: San Salvador">

@@ -5,6 +5,7 @@
             <h3><i class="fas fa-user-plus me-2"></i>Crear Nuevo Usuario</h3>
             <p>Complete el formulario para registrar un usuario en el sistema.</p>
             <form action="<?php echo URLROOT; ?>/admin/users_add" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="nombre">Nombre Completo: <sup>*</sup></label>
