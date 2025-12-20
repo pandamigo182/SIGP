@@ -57,7 +57,7 @@
 
 1.  **Clonar Repositorio**
     ```bash
-    git clone https://github.com/tu-org/sigp.git
+    git clone https://github.com/pandamigo182/sigp.git
     cd sigp
     ```
 
