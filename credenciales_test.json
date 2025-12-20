@@ -1,0 +1,27 @@
+[
+  {
+    "rol": "Administrador",
+    "email": "admin@sigp.com",
+    "password": "12345"
+  },
+  {
+    "rol": "Coordinador",
+    "email": "coordinador@sigp.com",
+    "password": "12345"
+  },
+  {
+    "rol": "Tutor",
+    "email": "tutor1@test.com",
+    "password": "12345"
+  },
+  {
+    "rol": "Empresa",
+    "email": "contacto@techsolutions.local",
+    "password": "12345"
+  },
+  {
+    "rol": "Estudiante",
+    "email": "estudiante20@udb.edu.sv",
+    "password": "12345"
+  }
+]

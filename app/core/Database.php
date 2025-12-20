@@ -18,7 +18,7 @@ class Database {
 
     public function __construct(){
         // Configurar DSN
-        $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
+        $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname . ';charset=utf8mb4';
         $options = array(
             PDO::ATTR_PERSISTENT => true,
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -27,7 +27,7 @@ class Database {
         // Crear instancia PDO
         try{
             $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
-            $this->dbh->exec("set names utf8");
+            $this->dbh->exec("set names utf8mb4");
         } catch(PDOException $e){
             $this->error = $e->getMessage();
             echo $this->error;
