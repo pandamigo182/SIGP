@@ -1,8 +1,8 @@
 <?php
 class Reportes extends Controller {
     public function __construct(){
-        // Only Admin or maybe Empresa? User said "Admin... Reports" implies Admin.
-        // Assuming Admin for now.
+        // ¿Solo Administrador o tal vez Empresa? El usuario dijo "Admin... Reportes" lo que implica Admin.
+        // Asumiendo Admin por ahora.
         if(!isset($_SESSION['user_role']) || $_SESSION['user_role'] != 1){
              redirect('auth/login');
         }
@@ -17,11 +17,11 @@ class Reportes extends Controller {
         $deptStatsRaw = $this->reporteModel->getDepartmentStats();
         $rubroStats = $this->reporteModel->getEmpresasByRubro();
 
-        // Process Department Data for Highmaps (sv-all.js)
-        // Keys: sv-ah (Ahuachapan), sv-ca (Cabanas), sv-ch (Chalatenango), sv-cu (Cuscatlan), 
-        // sv-li (La Libertad), sv-pa (La Paz), sv-un (La Union), sv-mo (Morazan), 
+        // Procesar datos de departamentos para Highmaps (sv-all.js)
+        // Claves: sv-ah (Ahuachapán), sv-ca (Cabañas), sv-ch (Chalatenango), sv-cu (Cuscatlán), 
+        // sv-li (La Libertad), sv-pa (La Paz), sv-un (La Unión), sv-mo (Morazán), 
         // sv-sm (San Miguel), sv-ss (San Salvador), sv-sv (San Vicente), sv-sa (Santa Ana), 
-        // sv-so (Sonsonate), sv-us (Usulutan)
+        // sv-so (Sonsonate), sv-us (Usulután)
         
         $mapData = [];
         $keyMap = [
@@ -45,7 +45,7 @@ class Reportes extends Controller {
             $name = mb_strtoupper(trim($row->departamento), 'UTF-8');
             if(isset($keyMap[$name])){
                 $code = $keyMap[$name];
-                // Check if key already exists (aggregate if variations)
+                // Verificar si la clave ya existe (agregar si hay variaciones)
                 $found = false;
                 foreach($mapData as &$md){
                     if($md[0] == $code){

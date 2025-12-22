@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="<?php echo URLROOT; ?>/css/style.css">
     <link rel="icon" href="<?php echo URLROOT; ?>/img/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title><?php echo ($sys && !empty($sys->nombre_sistema)) ? $sys->nombre_sistema : SITENAME; ?></title>
@@ -77,7 +78,7 @@
                                             </a>
                                         </li>
                                     <?php endforeach; ?>
-                                    <li><a class="dropdown-item text-center small text-primary fw-bold py-2" href="#">Marcar todas como leídas</a></li>
+                                    <li><a class="dropdown-item text-center small text-primary fw-bold py-2" href="<?php echo URLROOT; ?>/users/notifications_mark_read">Marcar todas como leídas</a></li>
                                 <?php else: ?>
                                     <li class="dropdown-item text-muted text-center py-3 small">
                                         <i class="far fa-bell-slash fa-2x mb-2 d-block"></i>
@@ -110,7 +111,7 @@
                                         }
                                     }
                                 ?>
-                                <img src="<?php echo $avatar; ?>" alt="Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                <img src="<?php echo $avatar; ?>" alt="Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;" loading="lazy">
                                 <span><?php echo $_SESSION['user_name']; ?></span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0">

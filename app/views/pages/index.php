@@ -118,7 +118,7 @@
                              <?php 
                                 $logoPath = !empty($destacada->logoEmpresa) ? URLROOT . '/' . $destacada->logoEmpresa : 'https://ui-avatars.com/api/?name=' . urlencode($destacada->nombreEmpresa) . '&background=random';
                              ?>
-                             <img src="<?php echo $logoPath; ?>" alt="Logo" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                             <img src="<?php echo $logoPath; ?>" alt="Logo" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;" loading="lazy">
                              <div>
                                  <h6 class="card-title fw-bold mb-0 text-truncate" style="max-width: 200px;"><?php echo $destacada->titulo; ?></h6>
                                  <small class="text-muted"><?php echo $destacada->nombreEmpresa; ?></small>
@@ -164,7 +164,7 @@
                                  <?php 
                                     $logoPath = !empty($plaza->logoEmpresa) ? URLROOT . '/' . $plaza->logoEmpresa : 'https://ui-avatars.com/api/?name=' . urlencode($plaza->nombreEmpresa) . '&background=random';
                                  ?>
-                                 <img src="<?php echo $logoPath; ?>" alt="Logo" class="rounded mb-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                 <img src="<?php echo $logoPath; ?>" alt="Logo" class="rounded mb-2" style="width: 40px; height: 40px; object-fit: cover;" loading="lazy">
                                  <?php if(strtotime($plaza->fechaPublicacion) > strtotime('-24 hours')): ?>
                                      <span class="badge bg-danger rounded-1">NUEVO!</span>
                                  <?php endif; ?>

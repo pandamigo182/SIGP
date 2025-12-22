@@ -372,4 +372,24 @@ class Users extends Controller {
              redirect('users/security');
         }
     }
+
+    public function notifications_mark_read(){
+        if($_SERVER['REQUEST_METHOD'] == 'GET'){
+            // No CSRF check strictly required for this benign action, but good practice. 
+            // For simplicity in a GET link (as in header), we skip strict CSRF POST check or use a token in URL.
+            // As user asked for a simple button/link:
+            
+            $this->notificationModel = $this->model('Notification'); // Ensure model is loaded or use property if cached (User controller ctor didn't load it)
+            // Fix: User Controller constructor didn't list Notification model. Load it here.
+            $notifModel = $this->model('Notification');
+            $notifModel->markAllAsRead($_SESSION['user_id']);
+            
+            // Return to previous page or dashboard
+            if(isset($_SERVER['HTTP_REFERER'])){
+                header('Location: ' . $_SERVER['HTTP_REFERER']);
+            } else {
+                redirect('dashboard');
+            }
+        }
+    }
 }

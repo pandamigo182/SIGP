@@ -1,33 +1,31 @@
 # Cronograma de Trabajo - Proyecto SIGP
 
-Este documento detalla las fases, actividades y tiempos estimados para la reinstalación, verificación y pruebas exhaustivas del sistema SIGP.
+Este documento detalla el progreso actual en la optimización y validación del sistema.
 
-## Fase 1: Inicialización y Configuración (Est. 30 min)
+## Fase 1: Auditoría y Seguridad (Completado)
 | Tarea | Descripción | Estado |
 |-------|-------------|--------|
-| Limpieza de Entorno | Eliminación de archivos previos en htdocs | Completado |
-| Clonación de Repositorio | Descarga de `pandamigo182/SIGP` | Completado |
-| Configuración BD | Importación de esquema y datos semilla | Completado |
-| Verificación de Roles | Identificación de los 5 roles en base de datos | Completado |
+| Auditoría de Código | Revisión de controladores y modelos | Completado |
+| Seguridad SMTP | Migración de credenciales a .env | Completado |
+| Traducción | Conversión de comentarios a Español | Completado |
 
-## Fase 2: Verificación Funcional por Roles (Est. 2 horas)
+## Fase 2: Mejoras Funcionales (Completado)
 | Tarea | Descripción | Estado |
 |-------|-------------|--------|
-| Rol 1 (Admin) | Login, CRUD usuarios, Configuración global | Completado |
-| Rol 2 (Empresa) | Login, Gestión de Ofertas, Perfil | Listo para prueba |
-| Rol 3 (Estudiante) | Login, Aplicación a ofertas, Perfil | Listo para prueba |
-| Rol 4 (Coord/Otros) | Verificación de permisos específicos | Listo para prueba |
-| Rol 5 (Auditor/Otros) | Verificación de permisos específicos | Listo para prueba |
+| Configuración Global | Definición de constantes de Roles | Completado |
+| Integridad de Datos | Normalización de Departamentos en Perfil | Completado |
+| Documentación Markdown | Creación de manuales y diccionarios .md | Completado |
 
-## Fase 3: Pruebas de Calidad (QA) y Rendimiento (Est. 1.5 horas)
+## Fase 3: Pruebas de Calidad (QA) y Rendimiento (Completado)
 | Tarea | Descripción | Estado |
 |-------|-------------|--------|
-| Pruebas de Estrés | Simulación de carga y concurrencia | Omitido (Verificado Estabilidad) |
-| Seguridad | Validación contra inyecciones y XSS | Completado (Parcial/Admin) |
-| UX/UI y Responsive | Auditoría visual en Móvil, Tablet y Desktop | Pendiente Manual |
+| Pruebas de Estrés | Protocolo Leviatán (Carga, DoS, Fuzzing) | Completado |
+| UX/UI y Responsive | Auditoría visual y Tutorial de Bienvenida | Completado |
+| Funcionalidades Extra | Marcar Leídas, Soporte Masivo | Completado |
 
-## Fase 4: Documentación y Reporte (Continuo)
+## Fase 4: Reporte Final (Completado)
 | Tarea | Descripción | Estado |
 |-------|-------------|--------|
-| Bitácora de Hallazgos | Registro de bugs y observaciones | En Progreso |
-| Reporte Final | Resumen ejecutivo del estado del sistema | Pendiente |
+| Reporte de Funcionalidades| Documento detallado de capacidades | Completado |
+| Reporte de Optimización | Guía para escalabilidad y rendimiento | Completado |
+| Auditoría Final | Regeneración de reporte tras cambios | Completado |

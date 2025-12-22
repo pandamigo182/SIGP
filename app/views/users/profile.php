@@ -114,7 +114,23 @@
                                     </div>
                                     <div class="col-md-4 mb-2">
                                         <label for="departamento">Departamento:</label>
-                                        <input type="text" name="departamento" id="departamento" class="form-control form-control-sm" value="<?php echo $data['departamento']; ?>">
+                                        <select name="departamento" id="departamento" class="form-select form-select-sm">
+                                            <option value="">Seleccione</option>
+                                            <option value="Ahuachapán" <?php echo ($data['departamento'] == 'Ahuachapán') ? 'selected' : ''; ?>>Ahuachapán</option>
+                                            <option value="Cabañas" <?php echo ($data['departamento'] == 'Cabañas') ? 'selected' : ''; ?>>Cabañas</option>
+                                            <option value="Chalatenango" <?php echo ($data['departamento'] == 'Chalatenango') ? 'selected' : ''; ?>>Chalatenango</option>
+                                            <option value="Cuscatlán" <?php echo ($data['departamento'] == 'Cuscatlán') ? 'selected' : ''; ?>>Cuscatlán</option>
+                                            <option value="La Libertad" <?php echo ($data['departamento'] == 'La Libertad') ? 'selected' : ''; ?>>La Libertad</option>
+                                            <option value="La Paz" <?php echo ($data['departamento'] == 'La Paz') ? 'selected' : ''; ?>>La Paz</option>
+                                            <option value="La Unión" <?php echo ($data['departamento'] == 'La Unión') ? 'selected' : ''; ?>>La Unión</option>
+                                            <option value="Morazán" <?php echo ($data['departamento'] == 'Morazán') ? 'selected' : ''; ?>>Morazán</option>
+                                            <option value="San Miguel" <?php echo ($data['departamento'] == 'San Miguel') ? 'selected' : ''; ?>>San Miguel</option>
+                                            <option value="San Salvador" <?php echo ($data['departamento'] == 'San Salvador') ? 'selected' : ''; ?>>San Salvador</option>
+                                            <option value="San Vicente" <?php echo ($data['departamento'] == 'San Vicente') ? 'selected' : ''; ?>>San Vicente</option>
+                                            <option value="Santa Ana" <?php echo ($data['departamento'] == 'Santa Ana') ? 'selected' : ''; ?>>Santa Ana</option>
+                                            <option value="Sonsonate" <?php echo ($data['departamento'] == 'Sonsonate') ? 'selected' : ''; ?>>Sonsonate</option>
+                                            <option value="Usulután" <?php echo ($data['departamento'] == 'Usulután') ? 'selected' : ''; ?>>Usulután</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-4 mb-2">
                                         <label for="municipio">Municipio:</label>

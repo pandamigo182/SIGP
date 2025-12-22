@@ -7,7 +7,7 @@ class Reporte {
     }
 
     public function getTotalStudents(){
-        // Role 3 or 5? User said 5 in profile logic.
+        // ¿Rol 3 o 5? El usuario indicó 5 en la lógica del perfil.
         $this->db->query("SELECT COUNT(*) as total FROM usuarios WHERE role_id = 5");
         $row = $this->db->single();
         return $row->total;
@@ -31,8 +31,8 @@ class Reporte {
     }
 
     public function getDepartmentStats(){
-        // Group by user input text. 
-        // Note: This relies on users typing correctly. 
+        // Agrupar por texto ingresado por el usuario. 
+        // Nota: Esto depende de que los usuarios escriban correctamente. 
         $this->db->query("SELECT departamento, COUNT(*) as total FROM perfil_estudiantes WHERE departamento != '' GROUP BY departamento");
         return $this->db->resultSet();
     }

@@ -31,7 +31,7 @@ class Controller {
     protected function verifyCsrf(){
         if($_SERVER['REQUEST_METHOD'] == 'POST'){
             if(!validateCsrfToken($_POST['csrf_token'] ?? '')){
-                die('Error de seguridad: Token CSRF inválido / Security Error: Invalid CSRF Token');
+                die('Error de seguridad: Token CSRF inválido.');
             }
         }
     }

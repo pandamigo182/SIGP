@@ -3,7 +3,7 @@
         'name' => 'pandamigo182/sigp',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'd79e825a27a178df2e3cb99125d112e98ceeb8a7',
+        'reference' => '2fae95f36b1a261b9c2739324b258004a0e80331',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'pandamigo182/sigp' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'd79e825a27a178df2e3cb99125d112e98ceeb8a7',
+            'reference' => '2fae95f36b1a261b9c2739324b258004a0e80331',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

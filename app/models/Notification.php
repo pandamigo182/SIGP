@@ -25,4 +25,10 @@ class Notification {
         $this->db->bind(':id', $id);
         return $this->db->execute();
     }
+
+    public function markAllAsRead($userId){
+        $this->db->query("UPDATE notificaciones SET leido = 1 WHERE usuario_id = :uid");
+        $this->db->bind(':uid', $userId);
+        return $this->db->execute();
+    }
 }

@@ -98,7 +98,7 @@ class Auth extends Controller {
 
             } else {
                 // Cargar vista con errores
-                // Mapear $datos a $data si la vista usa $data (Standard MVC pattern usually expects $data)
+                // Mapear $datos a $data si la vista usa $data (El patrón MVC estándar usualmente espera $data)
                 $data = $datos;
                 $this->view('auth/register', $data);
             }
@@ -428,18 +428,18 @@ class Auth extends Controller {
             // Configurar SMTP
             // $mail->SMTPDebug = 2; 
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com'; // O leer de .env
+            $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.gmail.com'; 
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'tu_correo_temporal@gmail.com'; // REEMPLAZAR O LEER DE ENV
-            $mail->Password   = 'tu_app_password'; // REEMPLAZAR O LEER DE ENV
-            $mail->SMTPSecure = 'tls';
-            $mail->Port       = 587;
+            $mail->Username   = getenv('SMTP_USER') ?: 'tu_correo@gmail.com'; 
+            $mail->Password   = getenv('SMTP_PASS') ?: 'tu_password'; 
+            $mail->SMTPSecure = getenv('SMTP_SECURE') ?: 'tls';
+            $mail->Port       = getenv('SMTP_PORT') ?: 587;
 
-            // Recipients
+            // Destinatarios
             $mail->setFrom('no-reply@sigp.com', 'SIGP Security');
             $mail->addAddress($email);
 
-            // Content
+            // Contenido
             $link = URLROOT . "/auth/reset_password?email=" . $email . "&token=" . $token;
             
             $mail->isHTML(true);
@@ -449,7 +449,7 @@ class Auth extends Controller {
             $mail->send();
             return true;
         } catch (Exception $e) {
-            // Log error
+            // Registrar error
             return false;
         }
     }

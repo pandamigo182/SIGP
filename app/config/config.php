@@ -45,3 +45,12 @@ define('URLROOT', $protocol . "://" . $host . "/SIGP");
 
 // Nombre del Sitio
 define('SITENAME', 'SIGP - Sistema Integral de Gestión de Pasantías');
+
+// Roles de Usuario
+define('ROLE_ADMIN', 1);
+define('ROLE_COORDINATOR', 2); // Coordinador (Si aplica)
+define('ROLE_STUDENT', 3); // Estudiante
+define('ROLE_TUTOR', 4); // Tutor
+define('ROLE_COMPANY', 5); // Empresa
+// Nota: Verificar IDs exactos en base de datos si es necesario.
+

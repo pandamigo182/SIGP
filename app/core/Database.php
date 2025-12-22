@@ -12,7 +12,7 @@ class Database {
     private $pass = DB_PASS;
     private $dbname = DB_NAME;
 
-    private $dbh; // Database Handler
+    private $dbh; // Manejador de Base de Datos
     private $stmt;
     private $error;
 
@@ -85,7 +85,7 @@ class Database {
         return $this->dbh->lastInsertId();
     }
 
-    // Transaction Methods
+    // Métodos de Transacción
     public function beginTransaction(){
         return $this->dbh->beginTransaction();
     }
