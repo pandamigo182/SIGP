@@ -4,6 +4,7 @@
 
 | Commit ID | Autor | Fecha | Descripción |
 |-----------|-------|-------|-------------|
+| - | Edwin Juárez | 2025-12-22 | Creación de Guía de Despliegue Azure for Students. |
 | - | Edwin Juárez | 2025-12-22 | Creación de Guía de Despliegue y Script de Optimización SQL. |
 | - | Edwin Juárez | 2025-12-22 | Implementación de Lazy Loading en Vistas. |
 | - | Edwin Juárez | 2025-12-22 | Implementación de Tutorial Interactivo (Intro.js) y Marcar Leídas. |
@@ -21,6 +22,7 @@
 ### Fase 2: Optimización y Despliegue
 | Categoría | Acción | Resultado | Detalles |
 |-----------|--------|-----------|----------|
+| DevOps | Guía Azure | Documentado | `DEPLOY_AZURE.md` creado como alternativa sin tarjeta de crédito. |
 | Backend | SQL Indexes | Script Creado | `optimization_indexes.sql` listo para importar. Acelera queries críticas. |
 | Frontend | Lazy Loading | Implementado | Se agregó `loading="lazy"` en avatares y logos de empresas para mejorar First Contentful Paint. |
 | DevOps | Guía Digital Ocean | Documentado | `DEPLOY_DIGITAL_OCEAN.md` detalla pasos para Ubuntu 22.04 + LAMP. |
