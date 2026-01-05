@@ -40,7 +40,7 @@ define('APPROOT', dirname(dirname(__FILE__)));
 
 // URL raíz (Dinámica)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
-$host = $_SERVER['HTTP_HOST'];
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 define('URLROOT', $protocol . "://" . $host . "/SIGP");
 
 // Nombre del Sitio

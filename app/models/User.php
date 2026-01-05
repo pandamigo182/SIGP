@@ -14,7 +14,9 @@ class User {
         // Vincular valores
         $this->db->bind(':nombre', $data['nombre']);
         $this->db->bind(':email', $data['email']);
-        $this->db->bind(':password', $data['password']);
+        $this->db->bind(':email', $data['email']);
+        // SEGURIDAD ISO: Uso de Argon2id
+        $this->db->bind(':password', password_hash($data['password'], PASSWORD_ARGON2ID));
         $this->db->bind(':role_id', $data['role_id']);
         $this->db->bind(':empresa_id', !empty($data['empresa_id']) ? $data['empresa_id'] : null);
         $this->db->bind(':institucion_id', !empty($data['institucion_id']) ? $data['institucion_id'] : null);
@@ -49,6 +51,14 @@ class User {
         if($row){
              $hashed_password = $row->password;
              if(password_verify($password, $hashed_password)){
+                 // SEGURIDAD: Rehash automático si el algoritmo es viejo (Bcrypt -> Argon2id)
+                 if (password_needs_rehash($hashed_password, PASSWORD_ARGON2ID)) {
+                     $newHash = password_hash($password, PASSWORD_ARGON2ID);
+                     $this->db->query('UPDATE usuarios SET password = :password WHERE id = :id');
+                     $this->db->bind(':password', $newHash);
+                     $this->db->bind(':id', $row->id);
+                     $this->db->execute();
+                 }
                  return $row;
              }
         }
@@ -97,7 +107,7 @@ class User {
         // Si hay password, actualizar todo, si no, mantener password
         if(!empty($data['password'])){
              $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, password = :password, role_id = :role_id, empresa_id = :empresa_id, institucion_id = :institucion_id WHERE id = :id');
-             $this->db->bind(':password', $data['password']);
+             $this->db->bind(':password', password_hash($data['password'], PASSWORD_ARGON2ID));
         } else {
              $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, role_id = :role_id, empresa_id = :empresa_id, institucion_id = :institucion_id WHERE id = :id');
         }
@@ -155,7 +165,7 @@ class User {
     public function updateProfile($data){
         if(!empty($data['password'])){
              $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, password = :password, foto_perfil = :foto_perfil WHERE id = :id');
-             $this->db->bind(':password', password_hash($data['password'], PASSWORD_DEFAULT));
+             $this->db->bind(':password', password_hash($data['password'], PASSWORD_ARGON2ID));
         } else {
              $this->db->query('UPDATE usuarios SET nombre = :nombre, email = :email, foto_perfil = :foto_perfil WHERE id = :id');
         }
@@ -218,7 +228,7 @@ class User {
     public function resetPassword($email, $password){
         // 1. Update User Password
         $this->db->query('UPDATE usuarios SET password = :password WHERE email = :email');
-        $this->db->bind(':password', $password); // Hash should be passed or hashed here. Passing hash for consistency.
+        $this->db->bind(':password', password_hash($password, PASSWORD_ARGON2ID)); 
         $this->db->bind(':email', $email);
         
         if($this->db->execute()){

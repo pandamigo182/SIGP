@@ -11,7 +11,7 @@
 
                 <form action="<?php echo URLROOT; ?>/auth/reset_password_action" method="post">
                     <input type="hidden" name="token" value="<?php echo $_GET['token'] ?? ''; ?>">
-                    <input type="hidden" name="email" value="<?php echo $_GET['email'] ?? ''; ?>">
+                    <input type="hidden" name="email" value="<?php echo htmlspecialchars($_GET['email'] ?? ''); ?>">
                     
                     <div class="form-group mb-3">
                         <label for="password" class="form-label fw-bold">Nueva Contraseña</label>

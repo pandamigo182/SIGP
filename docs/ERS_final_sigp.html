@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificaciones de Requerimientos - SIGP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #525659;
+            font-family: 'Calibri', 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 40px 0;
+        }
+
+        /* LETTER SIZE CONFIGURATION */
+        .page {
+            width: 215.9mm;
+            min-height: 279.4mm;
+            padding: 25mm 20mm;
+            /* Top/Bottom padding adjusted for headers */
+            margin: 0 auto 30px auto;
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .page-cover {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 5px solid #0d47a1;
+        }
+
+        .page-content {
+            background-image: url('../public/img/membretado.png');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Margen interno para evitar solapamiento con membrete */
+            padding-top: 35mm;
+            padding-bottom: 30mm;
+        }
+
+        /* TYPOGRAPHY */
+        h1 {
+            color: #1a237e;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 22pt;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #283593;
+            font-size: 16pt;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        h3 {
+            color: #303f9f;
+            font-size: 14pt;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            border-left: 5px solid #303f9f;
+            padding-left: 10px;
+        }
+
+        h4 {
+            color: #0d47a1;
+            font-size: 12pt;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        p,
+        li {
+            font-size: 11pt;
+            line-height: 1.5;
+            text-align: justify;
+        }
+
+        /* TABLES */
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 10pt;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+
+        th,
+        td {
+            border: 1px solid #999;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #e8eaf6;
+            color: #1a237e;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .table-req th {
+            background-color: #f0f0f0;
+            width: 25%;
+        }
+
+        /* ISOGRAPH VISUAL */
+        .isograph-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 15px;
+        }
+
+        .iso-column {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .iso-title {
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+            color: #0d47a1;
+        }
+
+        .iso-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .iso-icon {
+            font-size: 20px;
+            width: 40px;
+            text-align: center;
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .iso-text h5 {
+            margin: 0;
+            font-weight: bold;
+            font-size: 10.5pt;
+            color: #000;
+        }
+
+        .iso-text p {
+            margin: 0;
+            font-size: 9pt;
+            color: #555;
+            font-style: italic;
+        }
+
+        /* BLUE COMPARISON TABLE */
+        .comparison-table th {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            border: 1px solid #002244;
+        }
+
+        .comparison-table td {
+            text-align: center;
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        /* LOGO */
+        .logo-main {
+            max-width: 280px;
+            margin-bottom: 20px;
+        }
+
+        /* PRINT SETTINGS */
+        @media print {
+            @page {
+                size: letter;
+                margin: 0;
+            }
+
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                width: 100%;
+                border: none;
+            }
+
+            .page-content {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Asegurar que las imágenes de fondo se impriman */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- PORTADA -->
+    <div class="page page-cover">
+        <img src="../public/img/logo-completo.svg" alt="Logo SIGP" class="logo-main" style="margin: 0 auto;">
+
+        <br><br>
+        <h1>Especificaciones de<br>Requerimientos de Software (ERS)</h1>
+        <h2>Sistema de Gestión de Pasantías (SIGP)</h2>
+        <br><br><br>
+
+        <div style="text-align: left; margin-top: 40px; padding: 0 40px;">
+            <p><strong>Fecha:</strong> 23 de Diciembre de 2025</p>
+            <p><strong>Emisión:</strong> Documento Final Fase 1</p>
+            <p><strong>Cliente:</strong> Cámara de Comercio y Pasantías Empresariales (CCPE)</p>
+
+            <br>
+            <p><strong>Grupo de Desarrollo 23:</strong></p>
+            <ul style="list-style: none; padding-left: 0;">
+                <li>Miguel Josué Iraheta Alvarado (Líder)</li>
+                <li>Diana Roció Jiménez</li>
+                <li>Jorge Alberto Jimenez Moreno</li>
+                <li>Carlos Ernesto Jimenez Valdiviezo</li>
+                <li>Edwin Efraín Juárez Mezquita</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- PAGINA 1: CONTROL Y EQUIPO -->
+    <div class="page page-content">
+        <h3>1. Historial de Versiones</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Versión</th>
+                    <th>Autor</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>15/12/2025</td>
+                    <td>1.0</td>
+                    <td>Miguel Iraheta</td>
+                    <td>Versión inicial fase diseño.</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2. Información del Proyecto</h3>
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>Proyecto</strong></td>
+                    <td>Sistema de Gestión de Pasantías (SIGP)</td>
+                </tr>
+                <tr>
+                    <td><strong>Cliente</strong></td>
+                    <td>CCPE</td>
+                </tr>
+                <tr>
+                    <td><strong>Inicio</strong></td>
+                    <td>Noviembre 2025</td>
+                </tr>
+                <tr>
+                    <td><strong>Fin Estimado</strong></td>
+                    <td>13 de Marzo de 2026</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>3. Aprobación (Mentoría)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre y Apellido</th>
+                    <th>Departamento</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="height:35px;"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="height:35px;"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINA 2: VISUALIZACION DE REQUERIMIENTOS -->
+    <div class="page page-content">
+        <h2 style="text-align: center; font-size: 20pt; border: none; margin-bottom: 30px;">Definición de Requisitos
+        </h2>
+
+        <!-- ISOGRAFO VISUAL -->
+        <div class="isograph-container">
+            <!-- Funcionales -->
+            <div class="iso-column">
+                <div class="iso-title text-primary">Requisitos Funcionales</div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-server"></i></div>
+                    <div class="iso-text">
+                        <h5>Qué hace</h5>
+                        <p>el sistema</p>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-code"></i></div>
+                    <div class="iso-text">
+                        <h5>Características</h5>
+                        <p>del producto</p>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-list-check"></i></div>
+                    <div class="iso-text">
+                        <h5>Requerimientos</h5>
+                        <p>del usuario final</p>
+                    </div>
+                </div>
+            </div>
+            <!-- No Funcionales -->
+            <div class="iso-column">
+                <div class="iso-title text-primary">Requisitos No Funcionales</div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-cogs"></i></div>
+                    <div class="iso-text">
+                        <h5>Cómo debe ser</h5>
+                        <p>el sistema (comportamiento)</p>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="iso-text">
+                        <h5>Propiedades</h5>
+                        <p>calidad, velocidad, seguridad</p>
+                    </div>
+                </div>
+                <div class="iso-item">
+                    <div class="iso-icon"><i class="fas fa-user-shield"></i></div>
+                    <div class="iso-text">
+                        <h5>Expectativas</h5>
+                        <p>experiencia y fiabilidad</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CUADRO COMPARATIVO -->
+        <h4 style="text-align: center; margin-top:20px;">Cuadro Comparativo</h4>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Requisitos Funcionales</th>
+                    <th>Requisitos No Funcionales</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Describen <strong>qué hace</strong> el sistema.</td>
+                    <td>Describen <strong>cómo debe ser</strong> el sistema.</td>
+                </tr>
+                <tr>
+                    <td>Detallan funcionalidades (Login, Reportes).</td>
+                    <td>Definen cualidades y restricciones (Velocidad, Encriptación).</td>
+                </tr>
+                <tr>
+                    <td>Centrados en funciones de negocio.</td>
+                    <td>Centrados en calidad, arquitectura y rendmiento.</td>
+                </tr>
+                <tr>
+                    <td>Orientados a resultados tangibles.</td>
+                    <td>Orientados a estándares de experiencia.</td>
+                </tr>
+                <tr>
+                    <td>Medibles por logro (Si/No).</td>
+                    <td>Medibles por escala (segundos, porcentaje).</td>
+                </tr>
+                <tr>
+                    <td>Afectan la interacción directa.</td>
+                    <td>Afectan la confianza y fiabilidad.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINA 3: REQUERIMIENTOS FUNCIONALES (DETALLE) -->
+    <div class="page page-content">
+        <h3>4. Requerimientos Funcionales</h3>
+        <p>A continuación se detallan las funcionalidades principales del sistema SIGP, diseñado bajo arquitectura MVC.
+        </p>
+
+        <!-- RF-001 -->
+        <table class="table-req">
+            <tr>
+                <th style="background:#003366; color:white;" colspan="4">Gestión de Usuarios y Roles (Auth)</th>
+            </tr>
+            <tr>
+                <th>ID Requisito</th>
+                <td>RF-001</td>
+                <th>Versión</th>
+                <td>1.0</td>
+            </tr>
+            <tr>
+                <th>Precondición</th>
+                <td colspan="3">El usuario no debe estar logueado. Base de datos operativa.</td>
+            </tr>
+            <tr>
+                <th>Descripción</th>
+                <td colspan="3">El sistema permitirá el acceso diferenciado para tres roles: Administrador (CCPE),
+                    Empresa y Estudiante.</td>
+            </tr>
+            <tr>
+                <th>Secuencia</th>
+                <td colspan="3">
+                    1. Usuario ingresa a la URL del login.<br>
+                    2. Ingresa credenciales (correo y contraseña).<br>
+                    3. Sistema valida credenciales encriptadas.<br>
+                    4. Sistema redirige al Dashboard correspondiente según el rol.
+                </td>
+            </tr>
+            <tr>
+                <th>Postcondición</th>
+                <td colspan="3">Usuario autenticado con acceso a su menú específico.</td>
+            </tr>
+            <tr>
+                <th>Excepciones</th>
+                <td colspan="3">Credenciales inválidas: mostrar alerta "Usuario o contraseña incorrectos".</td>
+            </tr>
+        </table>
+
+        <!-- RF-002 -->
+        <table class="table-req">
+            <tr>
+                <th style="background:#003366; color:white;" colspan="4">Publicación de Ofertas de Pasantía</th>
+            </tr>
+            <tr>
+                <th>ID Requisito</th>
+                <td>RF-002</td>
+                <th>Versión</th>
+                <td>1.0</td>
+            </tr>
+            <tr>
+                <th>Precondición</th>
+                <td colspan="3">Usuario Empresa autenticado y validado por CCPE.</td>
+            </tr>
+            <tr>
+                <th>Descripción</th>
+                <td colspan="3">Las empresas podrán crear fichas de ofertas detallando perfil, actividades y horarios.
+                </td>
+            </tr>
+            <tr>
+                <th>Secuencia</th>
+                <td colspan="3">
+                    1. Empresa selecciona "Nueva Oferta".<br>
+                    2. Completa formulario (Título, Descripción, Requisitos, Vacantes).<br>
+                    3. Guarda la oferta.<br>
+                    4. Sistema notifica al Admin para revisión.
+                </td>
+            </tr>
+            <tr>
+                <th>Postcondición</th>
+                <td colspan="3">Oferta creada en estado "Pendiente de Aprobación".</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- PAGINA 4: RF CONTINUACION + RNF -->
+    <div class="page page-content">
+
+        <!-- RF-003 -->
+        <table class="table-req">
+            <tr>
+                <th style="background:#003366; color:white;" colspan="4">Postulación a Pasantías</th>
+            </tr>
+            <tr>
+                <th>ID Requisito</th>
+                <td>RF-003</td>
+                <th>Versión</th>
+                <td>1.0</td>
+            </tr>
+            <tr>
+                <th>Precondición</th>
+                <td colspan="3">Usuario Estudiante autenticado y perfil completo.</td>
+            </tr>
+            <tr>
+                <th>Descripción</th>
+                <td colspan="3">Los estudiantes pueden aplicar a las ofertas activas enviando su perfil digital.</td>
+            </tr>
+            <tr>
+                <th>Secuencia</th>
+                <td colspan="3">
+                    1. Estudiante visualiza oferta.<br>
+                    2. Clic en "Aplicar".<br>
+                    3. Sistema confirma envío de datos y CV adjunto.<br>
+                    4. Se registra la postulación en la base de datos.
+                </td>
+            </tr>
+            <tr>
+                <th>Postcondición</th>
+                <td colspan="3">Empresa recibe notificación de nuevo candidato. Estado "Postulado".</td>
+            </tr>
+        </table>
+
+        <h3>5. Requerimientos No Funcionales (RNF)</h3>
+
+        <h4>1. Requisitos de Desempeño</h4>
+        <ul>
+            <li>El sistema debe cargar el Dashboard principal en menos de 2 segundos.</li>
+            <li>El sistema debe soportar la concurrencia de al menos 50 usuarios simultáneos (estudiantes/empresas).
+            </li>
+        </ul>
+
+        <h4>2. Requisitos de Usabilidad</h4>
+        <ul>
+            <li>El diseño debe ser Responsive (adaptable a móviles y tablets) utilizando Bootstrap o CSS Grid.</li>
+            <li>El proceso de registro de estudiante no debe tomar más de 5 minutos.</li>
+        </ul>
+
+        <h4>3. Requisitos de Confiabilidad</h4>
+        <ul>
+            <li>Disponibilidad del servicio del 99.9% durante el periodo de aplicaciones (Enero-Marzo).</li>
+            <li>Backups automáticos de la base de datos semanalmente.</li>
+        </ul>
+
+        <h4>4. Requisitos de Seguridad</h4>
+        <ul>
+            <li>Las contraseñas deben almacenarse encriptadas (ej. BCRYPT o Argon2).</li>
+            <li>Protección contra inyección SQL mediante el uso de PDO/Prepared Statements.</li>
+            <li>Validación de sesiones para evitar acceso a URLs directas sin login.</li>
+        </ul>
+    </div>
+
+    <!-- PAGINA 5: CRONOGRAMA -->
+    <div class="page page-content">
+        <h3>6. Cronograma de Ejecución</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fase</th>
+                    <th>Actividad</th>
+                    <th>Fechas Estimadas</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1. Inicio</td>
+                    <td>Levantamiento y Diseño BD</td>
+                    <td>Nov - Dic 2025</td>
+                    <td>Finalizado</td>
+                </tr>
+                <tr>
+                    <td>2. Desarrollo Back-End</td>
+                    <td>MVC, Auth, CRUD</td>
+                    <td>Enero 2026</td>
+                    <td>Pendiente</td>
+                </tr>
+                <tr>
+                    <td>3. Desarrollo Módulos</td>
+                    <td>Ofertas y Postulaciones</td>
+                    <td>Feb 2026</td>
+                    <td>Pendiente</td>
+                </tr>
+                <tr>
+                    <td>4. Cierre</td>
+                    <td>QA y Entrega Final</td>
+                    <td>Marzo 2026</td>
+                    <td>Pendiente</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top: 100px; text-align: center;">
+            <p><strong>Firma de Aprobación</strong></p>
+            <div style="width: 200px; border-bottom: 1px solid #000; margin: 50px auto;"></div>
+            <p>Representante CCPE</p>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,17 +1,40 @@
 # Manual de Usuario e Instalación - SIGP
 
+> **Guía Oficial de Despliegue y Uso**
+> **Proyecto:** Sistema Integral de Gestión de Pasantías
+> **Versión:** 1.0 (Final)
+> **Fecha:** Diciembre 2025
+
+---
+
+## Tabla de Contenidos
+1.  [Introducción](#1-introducción)
+2.  [Instalación](#2-instalación)
+    *   [Requisitos](#requisitos-del-sistema-producción)
+    *   [Seguridad](#garantías-de-seguridad)
+    *   [Pasos](#pasos-de-instalación-local--dev)
+3.  [Guía de Uso](#3-guía-de-uso)
+
+---
+
 ## 1. Introducción
 El Sistema Integral de Gestión de Pasantías (SIGP) facilita la conexión entre estudiantes y empresas para la realización de prácticas profesionales.
 
 ## 2. Instalación
 
-### Requisitos del Sistema
-*   **Servidor Web**: Apache / Nginx
-*   **Lenguaje**: PHP 7.4+
-*   **Base de Datos**: MySQL 5.7+ / MariaDB
-*   **Gestor de Dependencias**: Composer
+### Requisitos del Sistema (Producción)
+*   **Servidor Web**: Apache / Nginx / Azure App Service
+*   **Lenguaje**: PHP 7.4 - 8.2 (Recomendado 8.2 para Argon2id nativo)
+*   **Base de Datos**: MySQL 5.7+ / Azure Database for MySQL
+*   **Extensiones**: `sodium` (para Argon2id), `pdo`, `mbstring`.
 
-### Pasos de Instalación
+### Garantías de Seguridad
+El sistema implementa medidas de protección avanzadas:
+1.  **Protección de Datos**: Sus contraseñas son cifradas irreversiblemente.
+2.  **Sesiones Seguras**: Cierre automático por inactividad y protección contra robo de sesión.
+3.  **Auditoría**: Cada acción crítica queda registrada en la bitácora del sistema.
+
+### Pasos de Instalación (Local / Dev)
 1.  **Clonar Repositorio**: Descargue el código fuente en su servidor web.
 2.  **Base de Datos**:
     *   Cree una base de datos llamada `sigp_db`.

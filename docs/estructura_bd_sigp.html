@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura de Base de Datos - SIGP</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --dark-color: #003366;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f8f9fa;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header img {
+            height: 45px;
+            display: block;
+            margin-bottom: 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        .sidebar-header h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: #fff;
+        }
+
+        .sidebar-menu {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-btn {
+            width: 100%;
+            text-align: left;
+            padding: 10px 15px;
+            margin-bottom: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ddd;
+            border: none;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-btn.active {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            z-index: 10;
+        }
+
+        #diagram-container {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            text-align: center;
+            background-image: radial-gradient(#dee2e6 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* PRINT HEADER (Hidden by default) */
+        #print-header {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 3px solid #003366;
+            margin-bottom: 30px;
+        }
+
+        #print-header img {
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        #print-header h1 {
+            color: #003366;
+            margin: 0;
+            font-size: 18pt;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        #print-header p {
+            color: #666;
+            font-size: 10pt;
+            margin-top: 5px;
+        }
+
+        /* ANIMATION ELEMENTS */
+        .data-packet {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #e74c3c;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.9);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .data-label {
+            position: absolute;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            font-weight: bold;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Mermaid Nodes Customization & Sizing */
+        .mermaid {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Control SVG Size on Screen */
+        #diagram-container svg {
+            max-width: 90%;
+            height: auto;
+            max-height: 85vh;
+            /* Prevent overflowing screen height */
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 10mm;
+            }
+
+            body {
+                background: white;
+                -webkit-print-color-adjust: exact;
+                display: block;
+                height: auto;
+                overflow: visible;
+            }
+
+            .sidebar,
+            .toolbar {
+                display: none !important;
+            }
+
+            .main-content {
+                height: auto;
+                overflow: visible;
+                display: block;
+            }
+
+            #diagram-container {
+                padding: 0;
+                overflow: visible;
+                background: none;
+                display: block;
+            }
+
+            #print-header {
+                display: block !important;
+                border-bottom: 2px solid #003366;
+                margin-bottom: 20px;
+            }
+
+            /* Force SVG to fit Page */
+            #diagram-container svg {
+                max-width: 260mm;
+                /* A4 Landscape width safety margin */
+                max-height: 170mm;
+                /* A4 Landscape height safety margin */
+                width: auto !important;
+                height: auto !important;
+                display: block;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER PARA IMPRESION -->
+    <div id="print-header">
+        <img src="../public/img/logo-completo.svg" alt="SIGP Logo" onerror="this.style.display='none'">
+        <h1>Arquitectura de Datos - SIGP</h1>
+        <p>Esquema de Base de Datos y Flujo de Información</p>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="../public/img/logo-completo.svg" alt="SIGP Logo"
+                onerror="this.src='https://via.placeholder.com/150x50?text=SIGP+Logo'">
+            <h5>Arquitectura BD</h5>
+        </div>
+        <div class="sidebar-menu">
+            <small class="text-uppercase text-white-50 fw-bold mb-2 d-block" style="font-size:0.75rem;">Módulos</small>
+            <button class="nav-btn active" onclick="render('full', this)">
+                <span><i class="fas fa-database me-2"></i> Diagrama Completo</span>
+            </button>
+            <button class="nav-btn" onclick="render('auth', this)">
+                <span><i class="fas fa-shield-alt me-2"></i> Auth & Roles</span>
+            </button>
+            <button class="nav-btn" onclick="render('estudiantes', this)">
+                <span><i class="fas fa-user-graduate me-2"></i> Estudiantes</span>
+            </button>
+            <button class="nav-btn" onclick="render('empresas', this)">
+                <span><i class="fas fa-building me-2"></i> Empresas</span>
+            </button>
+            <button class="nav-btn" onclick="render('pasantias', this)">
+                <span><i class="fas fa-briefcase me-2"></i> Pasantías</span>
+            </button>
+            <button class="nav-btn" onclick="render('geo', this)">
+                <span><i class="fas fa-map-marked-alt me-2"></i> Geografía</span>
+            </button>
+
+            <hr class="border-secondary">
+
+            <small class="text-uppercase text-white-50 fw-bold mb-2 d-block"
+                style="font-size:0.75rem;">Simulaciones</small>
+            <button class="nav-btn" onclick="simulate('login')">
+                <span><i class="fas fa-sign-in-alt me-2"></i> Login</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('register')">
+                <span><i class="fas fa-user-plus me-2"></i> Registro</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('est_profile')">
+                <span><i class="fas fa-id-card me-2"></i> Perfil Est.</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('emp_plaza')">
+                <span><i class="fas fa-briefcase me-2"></i> Publicar Plaza</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('postulacion')">
+                <span><i class="fas fa-paper-plane me-2"></i> Postulación</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('pasantia_ini')">
+                <span><i class="fas fa-handshake me-2"></i> Iniciar Pasantía</span>
+            </button>
+            <button class="nav-btn" onclick="simulate('geo_search')">
+                <span><i class="fas fa-globe me-2"></i> Consulta Geo</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="main-content">
+        <div class="toolbar">
+            <div>
+                <h6 class="mb-0 text-dark fw-bold" id="module-title">Diagrama Completo</h6>
+                <div class="text-muted small mt-0">
+                    <span id="node-count" class="badge bg-secondary" style="font-size:0.7rem">0</span> Entidades
+                </div>
+            </div>
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" onclick="exportSVG()">
+                    <i class="fas fa-download me-1"></i> SVG
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print me-1"></i> PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="diagram-container">
+            <!-- Animation Widgets -->
+            <div id="packet" class="data-packet"></div>
+            <div id="label" class="data-label">Datos</div>
+
+            <div class="mermaid" id="mermaid-graph">
+                <!-- Graph renders here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA DEFINITION ---
+        const tables = {
+            'usuarios': `usuarios{int id PK int role_id FK string email string password}`,
+            'roles': `roles{int id PK string nombre}`,
+            'perfil_estudiantes': `perfil_estudiantes{int id PK int usuario_id FK string matricula}`,
+            'carreras': `carreras{int id PK string nombre}`,
+            'habilidades': `habilidades{int id PK string nombre}`,
+            'usuario_habilidades': `usuario_habilidades{int id PK int usuario_id FK int habilidad_id FK}`,
+            'experiencia_laboral': `experiencia_laboral{int id PK int usuario_id FK string empresa}`,
+            'empresas': `empresas{int id PK string nombre string rubro}`,
+            'perfil_empresas': `perfil_empresas{int id PK int user_id FK string razon_social}`,
+            'plazas': `plazas{int id PK int empresa_id FK string titulo}`,
+            'postulaciones': `postulaciones{int id PK int plaza_id FK int est_id FK string estado}`,
+            'pasantias': `pasantias{int id PK int est_id FK int emp_id FK}`,
+            'reportes': `reportes{int id PK int pasantia_id FK string contenido}`,
+            'evaluaciones': `evaluaciones{int id PK int pasantia_id FK decimal nota}`,
+            'instituciones': `instituciones{int id PK string nombre}`,
+            'departamentos': `departamentos{int id PK string nombre}`,
+            'municipios': `municipios{int id PK string nombre}`,
+            'distritos': `distritos{int id PK string nombre}`
+        };
+
+        const relations = [
+            { u: 'roles', v: 'usuarios', rel: '||--o{' },
+            { u: 'usuarios', v: 'perfil_estudiantes', rel: '||--||' },
+            { u: 'carreras', v: 'perfil_estudiantes', rel: '||--o{' },
+            { u: 'usuarios', v: 'experiencia_laboral', rel: '||--o{' },
+            { u: 'usuarios', v: 'usuario_habilidades', rel: '||--o{' },
+            { u: 'habilidades', v: 'usuario_habilidades', rel: '||--o{' },
+            { u: 'usuarios', v: 'perfil_empresas', rel: '||--||' },
+            { u: 'usuarios', v: 'plazas', rel: '||--o{' },
+            { u: 'plazas', v: 'postulaciones', rel: '||--o{' },
+            { u: 'usuarios', v: 'postulaciones', rel: '||--o{' },
+            { u: 'usuarios', v: 'pasantias', rel: '||--o{' },
+            { u: 'empresas', v: 'pasantias', rel: '||--o{' },
+            { u: 'pasantias', v: 'reportes', rel: '||--o{' },
+            { u: 'pasantias', v: 'evaluaciones', rel: '||--o{' },
+            { u: 'departamentos', v: 'municipios', rel: '||--o{' },
+            { u: 'municipios', v: 'distritos', rel: '||--o{' }
+        ];
+
+        const modules = {
+            'full': Object.keys(tables),
+            'auth': ['usuarios', 'roles'],
+            'estudiantes': ['usuarios', 'perfil_estudiantes', 'carreras', 'habilidades', 'usuario_habilidades', 'experiencia_laboral'],
+            'empresas': ['usuarios', 'perfil_empresas', 'empresas', 'plazas', 'postulaciones'],
+            'pasantias': ['pasantias', 'reportes', 'evaluaciones', 'usuarios', 'empresas'],
+            'geo': ['departamentos', 'municipios', 'distritos']
+        };
+
+        const titles = {
+            'full': 'Diagrama Completo', 'auth': 'Módulo: Autenticación',
+            'estudiantes': 'Módulo: Estudiantes', 'empresas': 'Módulo: Empresas',
+            'pasantias': 'Gestión de Pasantías', 'geo': 'Geografía'
+        };
+
+        // --- RENDER ---
+        mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+
+        async function render(mod, btn) {
+            try {
+                if (btn) {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+
+                document.getElementById('module-title').innerText = titles[mod] || 'Diagrama';
+                const active = modules[mod] || modules['full'];
+                document.getElementById('node-count').innerText = active.length;
+
+                let code = 'erDiagram\n';
+                active.forEach(t => code += tables[t] + '\n');
+
+                relations.forEach(r => {
+                    if (active.includes(r.u) && active.includes(r.v)) {
+                        code += `  ${r.u} ${r.rel} ${r.v} : "rel"\n`;
+                    }
+                });
+
+                const container = document.getElementById('mermaid-graph');
+                container.innerHTML = code;
+                container.removeAttribute('data-processed');
+
+                await mermaid.run({ nodes: [container] });
+
+                // CSS enforces sizing, but we can clean up attributes
+                const svg = container.querySelector('svg');
+                if (svg) {
+                    svg.removeAttribute('style'); // Use CSS control
+                    svg.removeAttribute('height'); // Allow Auto
+                    svg.removeAttribute('width');  // Allow Auto (max-width CSS)
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('mermaid-graph').innerHTML = `<div class="alert alert-danger small">Error: ${e.message}</div>`;
+            }
+        }
+
+        // --- ANIMATION ENGINE ---
+        function getPos(id) {
+            let el = document.querySelector(`g[id^="entity-${id}"]`) || document.querySelector(`g[id*="${id}"]`);
+            if (!el) {
+                document.querySelectorAll('.entityLabel').forEach(t => {
+                    if (t.innerHTML.trim() === id) el = t.closest('g');
+                });
+            }
+            if (!el) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+            const r = el.getBoundingClientRect();
+            const containerInfo = document.getElementById('diagram-container').getBoundingClientRect();
+
+            return {
+                x: (r.left - containerInfo.left) + (r.width / 2) + document.getElementById('diagram-container').scrollLeft,
+                y: (r.top - containerInfo.top) + (r.height / 2) + document.getElementById('diagram-container').scrollTop
+            };
+        }
+
+        function animStep(fromId, toId, label, delay) {
+            setTimeout(() => {
+                const start = (fromId === 'CLIENT') ? { x: 50, y: 50 } : getPos(fromId);
+                const end = getPos(toId);
+
+                const pkt = document.getElementById('packet');
+                const lbl = document.getElementById('label');
+
+                pkt.style.transition = 'none'; pkt.style.opacity = '1';
+                lbl.style.transition = 'none'; lbl.style.opacity = '1';
+
+                pkt.style.left = start.x + 'px'; pkt.style.top = start.y + 'px';
+                lbl.style.left = (start.x + 15) + 'px'; lbl.style.top = (start.y - 20) + 'px';
+                lbl.innerText = label;
+
+                void pkt.offsetWidth;
+
+                pkt.style.transition = 'all 1.5s ease-in-out';
+                lbl.style.transition = 'all 1.5s ease-in-out';
+                pkt.style.left = end.x + 'px'; pkt.style.top = end.y + 'px';
+                lbl.style.left = (end.x + 15) + 'px'; lbl.style.top = (end.y - 20) + 'px';
+
+                setTimeout(() => {
+                    flash(toId);
+                    pkt.style.opacity = '0';
+                    lbl.style.opacity = '0';
+                }, 1500);
+
+            }, delay);
+        }
+
+        function flash(id) {
+            const el = document.querySelector(`g[id^="entity-${id}"]`) || document.querySelector(`g[id*="${id}"]`);
+            if (el) {
+                const shape = el.querySelector('rect, polygon, path, circle');
+                if (shape) {
+                    const originalFill = shape.getAttribute('fill') || '#ECECFF';
+                    shape.setAttribute('fill', '#ffeaa7');
+                    setTimeout(() => shape.setAttribute('fill', originalFill), 400);
+                }
+            }
+        }
+
+        function simulate(type) {
+            render('full', document.querySelector(`button[onclick*='${type}']`)).then(() => {
+                setTimeout(() => {
+                    if (type === 'login') {
+                        animStep('CLIENT', 'usuarios', 'POST /login', 0);
+                        animStep('usuarios', 'roles', 'CHECK Role', 1600);
+                        animStep('usuarios', 'CLIENT', 'Return Token', 3200);
+                    }
+                    if (type === 'register') {
+                        animStep('CLIENT', 'usuarios', 'POST /register', 0);
+                        animStep('usuarios', 'perfil_estudiantes', 'INSERT Perfil', 1600);
+                        animStep('usuarios', 'roles', 'ASSIGN Role', 1600);
+                    }
+                    if (type === 'est_profile') {
+                        animStep('CLIENT', 'perfil_estudiantes', 'UPDATE Info', 0);
+                        animStep('perfil_estudiantes', 'usuario_habilidades', 'ADD Skill', 1600);
+                        animStep('usuario_habilidades', 'habilidades', 'LINK Tag', 3200);
+                    }
+                    if (type === 'emp_plaza') {
+                        animStep('CLIENT', 'empresas', 'AUTH Check', 0);
+                        animStep('empresas', 'plazas', 'INSERT Plaza', 1600);
+                    }
+                    if (type === 'postulacion') {
+                        animStep('CLIENT', 'plazas', 'GET /plazas', 0);
+                        animStep('CLIENT', 'postulaciones', 'POST /apply', 1600);
+                        animStep('postulaciones', 'usuarios', 'NOTIFY Empresa', 3200);
+                    }
+                    if (type === 'pasantia_ini') {
+                        animStep('CLIENT', 'pasantias', 'CREATE Contract', 0);
+                        animStep('pasantias', 'usuarios', 'LINK Student', 1600);
+                        animStep('pasantias', 'empresas', 'LINK Company', 1600);
+                    }
+                    if (type === 'geo_search') {
+                        animStep('CLIENT', 'departamentos', 'SELECT Dept', 0);
+                        animStep('departamentos', 'municipios', 'FILTER Mun', 1600);
+                        animStep('municipios', 'distritos', 'SHOW Dist', 3200);
+                    }
+                }, 800);
+            });
+        }
+
+        // --- EXPORT SVG (Safe Mode) ---
+        function exportSVG() {
+            const svg = document.querySelector('#mermaid-graph svg');
+            if (!svg) { alert("No hay diagrama para exportar"); return; }
+
+            const clone = svg.cloneNode(true);
+            const w = 1200; // Fixed canvas width for export
+            const h = 900;
+            const headerH = 100;
+
+            // Set dimensions for export file
+            clone.setAttribute('viewBox', `0 -${headerH} ${w} ${h + headerH}`);
+            clone.setAttribute('width', w);
+            clone.setAttribute('height', h + headerH);
+            clone.style.maxWidth = 'none'; // Remove CSS constraint
+
+            // White Background for transparency issues
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', 0); bg.setAttribute('y', -headerH);
+            bg.setAttribute('width', w); bg.setAttribute('height', h + headerH);
+            bg.setAttribute('fill', '#ffffff');
+            clone.prepend(bg);
+
+            // Title
+            const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            t1.setAttribute('x', 30); t1.setAttribute('y', -60);
+            t1.setAttribute('font-family', 'Arial, sans-serif');
+            t1.setAttribute('font-size', '24'); t1.setAttribute('font-weight', 'bold');
+            t1.setAttribute('fill', '#003366');
+            t1.textContent = "ARQUITECTURA DE DATOS - SIGP";
+            clone.appendChild(t1);
+
+            // Download
+            const data = new XMLSerializer().serializeToString(clone);
+            const blob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'SIGP_Arquitectura.svg'; a.click();
+        }
+
+        window.onload = () => {
+            const btn = document.querySelector(".nav-btn[onclick*='full']");
+            if (btn) render('full', btn);
+        };
+    </script>
+</body>
+
+</html>

@@ -1,5 +1,20 @@
 # Propuesta Técnica SIGP V2.0
 
+> **Hoja de Ruta Tecnológica**
+> **Proyecto:** Sistema Integral de Gestión de Pasantías
+> **Versión:** 1.0 (Final)
+> **Fecha:** Diciembre 2025
+
+---
+
+## Tabla de Contenidos
+1.  [Resumen Ejecutivo](#resumen-ejecutivo)
+2.  [Objetivos](#objetivos)
+3.  [Stack Tecnológico Propuesto](#stack-tecnológico-propuesto)
+4.  [Roadmap de Migración](#roadmap-de-migración-estimado-3-meses)
+
+---
+
 ## Resumen Ejecutivo
 La versión 2.0 (V2.0) de SIGP busca modernizar la arquitectura tecnológica, migrando hacia frameworks robustos que permitan mayor escalabilidad y mantenibilidad.
 
@@ -12,7 +27,7 @@ La versión 2.0 (V2.0) de SIGP busca modernizar la arquitectura tecnológica, mi
 
 | Capa | V1.0 (Actual) | V2.0 (Propuesta) |
 | :--- | :--- | :--- |
-| **Backend** | PHP Nativo (MVC Custom) | Laravel 11 |
+| **Backend** | PHP Nativo Seguro (Argon2id + ISO 27001) | Laravel 11 |
 | **Frontend** | Bootstrap 5 + jQuery/Vanilla | Tailwind CSS + Livewire |
 | **Base de Datos** | MySQL | PostgreSQL / MySQL 8+ |
 | **Infraestructura** | XAMPP/VPS Tradicional | Docker + CI/CD Pipelines |

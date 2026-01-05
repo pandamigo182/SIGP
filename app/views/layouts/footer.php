@@ -39,6 +39,7 @@
                                 <li class="mb-2"><a href="<?php echo URLROOT; ?>/plazas" class="footer-link"><i class="fas fa-angle-right me-2 text-primary"></i>Pasantías</a></li>
                                 <li class="mb-2"><a href="<?php echo URLROOT; ?>/postulaciones/mis_postulaciones" class="footer-link"><i class="fas fa-angle-right me-2 text-primary"></i>Mis Postulaciones</a></li>
                                 <li class="mb-2"><a href="<?php echo URLROOT; ?>/users/profile" class="footer-link"><i class="fas fa-angle-right me-2 text-primary"></i>Hoja de Vida</a></li>
+                            <li class="mb-2 mt-3"><a href="<?php echo URLROOT; ?>/encuestas" class="btn btn-sm btn-outline-primary w-100 rounded-pill"><i class="fas fa-star me-2"></i>Danos tu opinión</a></li>
                             <?php else: ?>
                                 <!-- Default Authenticated -->
                                 <li class="mb-2"><a href="<?php echo URLROOT; ?>/dashboard" class="footer-link"><i class="fas fa-angle-right me-2 text-primary"></i>Dashboard</a></li>
@@ -265,47 +266,9 @@
             });
         }
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+    <!-- Tutorial script removed as requested by user -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Tutorial Interactivo (Game-like Onboarding)
-            if(!localStorage.getItem('sigp_tour_complete')){
-                 introJs().setOptions({
-                    steps: [
-                        { 
-                            title: '¡Bienvenido a SIGP!',
-                            intro: 'Este es el Sistema Integral de Gestión de Pasantías. Te guiaremos brevemente por las funciones principales.'
-                        },
-                        { 
-                            element: document.querySelector('.navbar-brand'), 
-                            intro: 'Este es tu punto de partida. Haz clic aquí para volver al inicio o Dashboard.',
-                            position: 'bottom'
-                        },
-                        { 
-                            element: document.querySelector('.nav-link[href*="plazas"]'), 
-                            intro: 'Encuentra oportunidades de pasantía explorando las plazas disponibles.',
-                            position: 'bottom'
-                        },
-                        { 
-                            element: document.getElementById('notifDropdown') || document.querySelector('.navbar-nav'), 
-                            intro: 'Mantente al día con notificaciones sobre tus postulaciones aquí.',
-                            position: 'left'
-                        },
-                        {
-                            element: document.querySelector('.site-footer'),
-                            intro: 'Accesos rápidos a módulos, soporte y contacto.',
-                            position: 'top'
-                        }
-                    ].filter(step => !step.element || document.body.contains(step.element)),
-                    showProgress: true,
-                    doneLabel: '¡Listo!',
-                    nextLabel: 'Siguiente',
-                    prevLabel: 'Anterior'
-                }).start().onexit(function() {
-                    localStorage.setItem('sigp_tour_complete', 'true');
-                });
-            }
-        });
+        // Placeholder for future tutorials if enabled
     </script>
 </body>
 </html>

@@ -4,10 +4,11 @@ Fecha: 22 de Diciembre de 2025
 Versión del Sistema: 2.0.0
 
 ## 1. Módulo de Seguridad y Acceso
-*   **Autenticación Robusta**: Login con encriptación de contraseñas (BCRYPT) y protección contra fuerza bruta básica.
+*   **Autenticación Robusta**: Login con encriptación de grado militar (**Argon2id**) y protección contra fuerza bruta por GPU.
 *   **Control de Sesiones**: Manejo seguro de sesiones PHP con regeneración de ID para prevenir secuestros.
 *   **Recuperación de Contraseña**: Flujo completo vía correo electrónico con tokens temporales de un solo uso.
 *   **Roles y Permisos**: Sistema RBAC con 5 niveles (Admin, Coordinador, Tutor, Empresa, Estudiante).
+*   **Auditoría ISO 27001**: Registro inmutable de eventos críticos (Log Global de Errores) y protección CSRF generalizada.
 
 ## 2. Módulo de Estudiantes
 *   **Perfil Profesional**: Edición completa de datos personales, académicos y ubicación.

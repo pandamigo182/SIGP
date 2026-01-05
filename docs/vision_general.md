@@ -1,5 +1,21 @@
 # Visión General del Sistema - SIGP
 
+> **Documento Técnico de Referencia**
+> **Proyecto:** Sistema Integral de Gestión de Pasantías
+> **Versión:** 1.0 (Final)
+> **Fecha:** Diciembre 2025
+
+---
+
+## Tabla de Contenidos
+1.  [Misión](#misión)
+2.  [Alcance](#alcance)
+3.  [Actores Principales](#actores-principales)
+4.  [Arquitectura Lógica](#arquitectura-lógica)
+5.  [Seguridad y Normativa](#seguridad-y-normativa-iso)
+
+---
+
 ## Misión
 Proveer una plataforma centralizada, eficiente y equitativa que conecte el talento académico con las necesidades del sector empresarial, simplificando la gestión administrativa de pasantías.
 
@@ -22,3 +38,9 @@ Ente regulador. Supervisa que las prácticas cumplan con los reglamentos académ
 
 ## Arquitectura Lógica
 El sistema sigue un patrón Modelo-Vista-Controlador (MVC) estricto, separando la lógica de negocio de la presentación, lo que facilita el mantenimiento y la auditoría del código.
+
+## Seguridad y Normativa (ISO)
+El SIGP ha sido auditado y fortalecido para cumplir con estándares internacionales:
+*   **ISO/IEC 27001 (Seguridad)**: Implementación de controles de acceso robustos, bitácora inmutable de eventos críticos y criptografía de grado militar.
+*   **Gestión de Credenciales**: Uso del algoritmo **Argon2id**, resistente a ataques de fuerza bruta por hardware (GPU/ASIC).
+*   **Observabilidad Total**: Sistema de monitoreo de errores fatales (Error 500) en tiempo real, visibles solo para administradores.

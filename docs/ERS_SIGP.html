@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Especificaciones de Requerimientos de Software - SIGP</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+            /* Fondo membretado según ruta local */
+            background-image: url('file:///C:/xampp/htdocs/SIGP/public/img/membretado.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente para leer mejor */
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .section-title {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            margin-top: 30px;
+            border-radius: 5px;
+        }
+        .meta-info {
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <img src="file:///C:/xampp/htdocs/SIGP/public/img/logo-completo.svg" alt="Logo SIGP" class="logo">
+        
+        <h1>DOCUMENTO ESPECIFICACIONES DE REQUERIMIENTOS DE SOFTWARE</h1>
+        <h2>Sistema de Gestión de Pasantías (SIGP)</h2>
+        <p><strong>Fecha:</strong> 23 de Diciembre de 2025</p>
+    </header>
+
+    <h3 class="section-title">1. Historial de Versiones</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Versión</th>
+                <th>Autor</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>23/12/2025</td>
+                <td>1.0</td>
+                <td>Edwin Efraín Juárez</td>
+                <td>Versión final de especificaciones para desarrollo fase 1.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 class="section-title">2. Información del Proyecto</h3>
+    <table>
+        <tbody>
+            <tr>
+                <th>Empresa / Organización</th>
+                [cite_start]<td>Cámara de Comercio y Pasantías Empresariales (CCPE) [cite: 1]</td>
+            </tr>
+            <tr>
+                <th>Nombre Proyecto</th>
+                [cite_start]<td>Sistema de Gestión de Pasantías (SIGP) [cite: 1]</td>
+            </tr>
+            <tr>
+                <th>Fecha de Inicio</th>
+                <td>Noviembre 2025</td>
+            </tr>
+            <tr>
+                <th>Fecha de Finalización (Estimada)</th>
+                <td>13 de Marzo de 2026</td>
+            </tr>
+            <tr>
+                <th>Cliente</th>
+                <td>CCPE / Universidades Aliadas</td>
+            </tr>
+            <tr>
+                <th>Integrantes del Equipo (Grupo 23)</th>
+                <td>
+                    <ul>
+                        [cite_start]<li><strong>Miguel Josué Iraheta Alvarado (Líder)</strong> [cite: 1]</li>
+                        [cite_start]<li>Diana Roció Jiménez [cite: 1]</li>
+                        [cite_start]<li>Jorge Alberto Jimenez Moreno [cite: 1]</li>
+                        [cite_start]<li>Carlos Ernesto Jimenez Valdiviezo [cite: 1]</li>
+                        [cite_start]<li>Edwin Efraín Juárez Mezquita [cite: 1]</li>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 class="section-title">3. Revisiones (Espacio reservado para mentoría)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre y Apellido</th>
+                <th>Departamento/Área</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3 class="section-title">4. Requerimientos Funcionales</h3>
+    <p>A continuación se detallan las funcionalidades principales del sistema SIGP, diseñado bajo arquitectura MVC.</p>
+
+    <table>
+        <tr>
+            <th>Funcionalidad</th>
+            <td colspan="3"><strong>Gestión de Usuarios y Roles (Auth)</strong></td>
+        </tr>
+        <tr>
+            <th>RF-001</th>
+            <td>RF-001</td>
+            <th>Versión</th>
+            <td>1.0</td>
+        </tr>
+        <tr>
+            <th>Precondición</th>
+            <td colspan="3">El usuario no debe estar logueado. Base de datos operativa.</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td colspan="3">El sistema permitirá el acceso diferenciado para tres roles: Administrador (CCPE), Empresa y Estudiante.</td>
+        </tr>
+        <tr>
+            <th>Secuencia de Acción</th>
+            <td colspan="3">
+                1. Usuario ingresa a la URL del login.<br>
+                2. Ingresa credenciales (correo y contraseña).<br>
+                3. Sistema valida credenciales encriptadas.<br>
+                4. Sistema redirige al Dashboard correspondiente según el rol.
+            </td>
+        </tr>
+        <tr>
+            <th>Postcondición</th>
+            <td colspan="3">Usuario autenticado con acceso a su menú específico.</td>
+        </tr>
+        <tr>
+            <th>Excepciones</th>
+            <td colspan="3">Credenciales inválidas: mostrar alerta "Usuario o contraseña incorrectos".</td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <th>Funcionalidad</th>
+            <td colspan="3"><strong>Publicación de Ofertas de Pasantía</strong></td>
+        </tr>
+        <tr>
+            <th>RF-00X</th>
+            <td>RF-002</td>
+            <th>Versión</th>
+            <td>1.0</td>
+        </tr>
+        <tr>
+            <th>Precondición</th>
+            <td colspan="3">Usuario Empresa autenticado y validado por CCPE.</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td colspan="3">Las empresas podrán crear fichas de ofertas detallando perfil, actividades y horarios.</td>
+        </tr>
+        <tr>
+            <th>Secuencia de Acción</th>
+            <td colspan="3">
+                1. Empresa selecciona "Nueva Oferta".<br>
+                2. Completa formulario (Título, Descripción, Requisitos, Vacantes).<br>
+                3. Guarda la oferta.<br>
+                4. Sistema notifica al Admin para revisión.
+            </td>
+        </tr>
+        <tr>
+            <th>Postcondición</th>
+            <td colspan="3">Oferta creada en estado "Pendiente de Aprobación".</td>
+        </tr>
+        <tr>
+            <th>Excepciones</th>
+            <td colspan="3">Campos vacíos: El sistema resalta los campos obligatorios.</td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <th>Funcionalidad</th>
+            <td colspan="3"><strong>Postulación a Pasantías</strong></td>
+        </tr>
+        <tr>
+            <th>RF-00X</th>
+            <td>RF-003</td>
+            <th>Versión</th>
+            <td>1.0</td>
+        </tr>
+        <tr>
+            <th>Precondición</th>
+            <td colspan="3">Usuario Estudiante autenticado y perfil completo.</td>
+        </tr>
+        <tr>
+            <th>Descripción</th>
+            <td colspan="3">Los estudiantes pueden aplicar a las ofertas activas enviando su perfil digital.</td>
+        </tr>
+        <tr>
+            <th>Secuencia de Acción</th>
+            <td colspan="3">
+                1. Estudiante visualiza oferta.<br>
+                2. Clic en "Aplicar".<br>
+                3. Sistema confirma envío de datos y CV adjunto.<br>
+                4. Se registra la postulación en la base de datos.
+            </td>
+        </tr>
+        <tr>
+            <th>Postcondición</th>
+            <td colspan="3">Empresa recibe notificación de nuevo candidato. Estado "Postulado".</td>
+        </tr>
+    </table>
+
+    <h3 class="section-title">5. Requerimientos No Funcionales</h3>
+    
+    <h4>1. Requisitos de Desempeño</h4>
+    <ul>
+        [cite_start]<li>El sistema debe cargar el Dashboard principal en menos de 2 segundos. [cite: 24]</li>
+        <li>El sistema debe soportar la concurrencia de al menos 50 usuarios simultáneos (estudiantes/empresas).</li>
+    </ul>
+
+    <h4>2. Requisitos de Usabilidad</h4>
+    <ul>
+        <li>El diseño debe ser Responsive (adaptable a móviles y tablets) utilizando Bootstrap o CSS Grid.</li>
+        <li>El proceso de registro de estudiante no debe tomar más de 5 minutos.</li>
+    </ul>
+
+    <h4>3. Requisitos de Confiabilidad</h4>
+    <ul>
+        [cite_start]<li>Disponibilidad del servicio del 99.9% durante el periodo de aplicaciones (Enero-Marzo). [cite: 35]</li>
+        <li>Backups automáticos de la base de datos semanalmente.</li>
+    </ul>
+
+    <h4>4. Requisitos de Seguridad</h4>
+    <ul>
+        [cite_start]<li>Las contraseñas deben almacenarse encriptadas (ej. BCRYPT o Argon2). [cite: 39]</li>
+        <li>Protección contra inyección SQL mediante el uso de PDO/Prepared Statements en PHP.</li>
+        <li>Validación de sesiones para evitar acceso a URLs directas sin login.</li>
+    </ul>
+
+    <h3 class="section-title">6. Cronograma de Ejecución (Proyección a Marzo)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Fase</th>
+                <th>Actividad</th>
+                <th>Fechas Estimadas</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Inicio</td>
+                <td>Levantamiento de Requerimientos y Diseño de BD</td>
+                <td>Noviembre - Diciembre 2025</td>
+                <td>Finalizado</td>
+            </tr>
+            <tr>
+                <td>2. Desarrollo Back-End</td>
+                <td>Estructura MVC, Autenticación y CRUD Usuarios</td>
+                <td>Enero 2026 (Semanas 1-2)</td>
+                <td>Pendiente</td>
+            </tr>
+            <tr>
+                <td>3. Desarrollo Módulos</td>
+                <td>Módulos de Ofertas, Postulaciones y Reportes</td>
+                <td>Enero - Febrero 2026</td>
+                <td>Pendiente</td>
+            </tr>
+            <tr>
+                <td>4. Pruebas y QA</td>
+                <td>Testing funcional, corrección de bugs y usabilidad</td>
+                <td>Febrero 2026 (Semana 4)</td>
+                <td>Pendiente</td>
+            </tr>
+            <tr>
+                <td>5. Cierre</td>
+                <td>Despliegue final, manuales y entrega proyecto</td>
+                <td>1 - 13 Marzo 2026</td>
+                <td>Pendiente</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>
